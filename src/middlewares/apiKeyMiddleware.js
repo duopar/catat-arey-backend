@@ -1,10 +1,10 @@
-const apiKeyMiddleware = (req, res, next) => {
+const validateUserApiKey = (req, res, next) => {
     const userApiKey = req.headers['x-api-key']
 
     if (userApiKey && userApiKey === process.env.API_KEY) {
         next()
     } else {
-        res.status(401).json({
+        return res.status(401).json({
             status: 'error',
             message: 'Invalid API key.',
             data: null
@@ -12,4 +12,4 @@ const apiKeyMiddleware = (req, res, next) => {
     }
 }
 
-module.exports = apiKeyMiddleware
+module.exports = validateUserApiKey

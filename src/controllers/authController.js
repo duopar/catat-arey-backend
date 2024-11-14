@@ -13,7 +13,7 @@ const register = async (req, res) => {
             createdAt: Timestamp.now()
         })
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             message: 'Registration successful.',
             data: {
@@ -23,7 +23,7 @@ const register = async (req, res) => {
         })
     } catch (error) {
         console.error("Error registering user:", error)
-        res.status(500).json({
+        return res.status(500).json({
             status: 'error',
             message: 'Registration failed due to server error.',
             data: null
