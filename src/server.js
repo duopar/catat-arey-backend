@@ -1,12 +1,10 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const http = require('http')
+const app = require('./app')
 
-app.get('/', (req, res) => {
-    res.send('Hello World')
-})
+const PORT = 3000
 
-app.listen(port, () => {
-    console.log(`Aplikasinya udah jalan coyy di port ${port}`)
-    console.log('Tinggal akses aja di http://localhost:3000/')
+const sever = http.createServer(app)
+
+sever.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
 })
