@@ -11,7 +11,7 @@ const authRoutes = require('./routes/authRoutes')
 const app = express()
 
 app.use(express.json())
-app.use(morgan('dev'))
+app.use(process.env.NODE_ENV === 'production' ? morgan('combined') : morgan('dev'))
 app.use(helmet())
 app.use(cors())
 
