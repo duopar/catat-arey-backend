@@ -1,4 +1,4 @@
-exports.register = (req, res) => {
+const register = (req, res) => {
     res.status(200).json({
         status: 'success',
         message: 'Registration successful.',
@@ -6,10 +6,16 @@ exports.register = (req, res) => {
     })
 }
 
-exports.login = (req, res) => {
+const login = (req, res) => {
 
 }
 
-exports.logout = (req, res) => {
-    
+const logout = (req, res) => {
+
+}
+
+module.exports = {
+    register,
+    login,
+    logout
 }
