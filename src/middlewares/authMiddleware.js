@@ -1,103 +1,54 @@
-const db = require('../config/firestore')
-const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-const validateUserRegistration = async (req, res, next) => {
-    try {
-        const { username, password, confirmPassword } = req.body
+const validateUserApiKey = (req, res, next) => {
+    const userApiKey = req.headers['x-api-key']
 
-        if (!username || !password || !confirmPassword) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Missing required fields: username, password, or confirmPassword.',
-                data: null
-            })
-        }
-    
-        if (password !== confirmPassword) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Password and confirmPassword do not match.',
-                data: null
-            })
-        }
-    
-        const userQuery = await db.collection('users').where('username', '==', username).get()
-
-        if (!userQuery.empty) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Username already exists.',
-                data: null
-            })
-        }
-
-        req.userData = {
-            username,
-            password
-        }
-
+    if (userApiKey && userApiKey === process.env.API_KEY) {
         next()
-    } catch (error) {
-        console.error("Error querying data:", error)
-        return res.status(500).json({
+    } else {
+        return res.status(401).json({
             status: 'error',
-            message: 'Registration failed due to server error: error querying data.',
+            message: 'Invalid API key.',
             data: null
         })
     }
 }
 
-const validateUserLogin = async (req, res, next) => {
+const validateUserToken = (req, res, next) => {
+    const userToken = req.headers['authorization'] //.split(' ')[1]
+
+    if (!userToken) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'No token provided. Authorization required.',
+            data: null
+        })
+    }
+
     try {
-        const { username, password } = req.body
+        const decodedUserToken = jwt.verify(userToken, process.env.JWT_SECRET)
 
-        if (!username || !password) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Missing required fields: username, or password.',
-                data: null
-            })
-        }
-    
-        const userQuery = await db.collection('users').where('username', '==', username).get()
-        
-        if (userQuery.empty) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Invalid credentials: username, or password.',
-                data: null
-            })
-        }
-        
-        const userPassword = userQuery.docs[0].data().password
+        req.decodedUserToken = decodedUserToken
 
-        if (!(await bcrypt.compare(password, userPassword))) {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Invalid credentials: username, or password.',
-                data: null
-            })
-        }
-
-        const userId = userQuery.docs[0].id
-
-        req.userData = {
-            userId,
-            username
-        }
-    
         next()
     } catch (error) {
-        console.error("Error querying data:", error)
-        return res.status(500).json({
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Token has expired.',
+                data: null
+            })
+        }
+
+        return res.status(401).json({
             status: 'error',
-            message: 'Login failed due to server error: error querying data.',
+            message: 'Invalid token.',
             data: null
         })
     }
 }
 
-module.exports = {
-    validateUserRegistration,
-    validateUserLogin
+module.exports = { 
+    validateUserApiKey, 
+    validateUserToken 
 }

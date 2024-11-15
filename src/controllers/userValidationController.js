@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
-const db = require('../config/firestore')
 const jwt = require('jsonwebtoken')
 const { Timestamp } = require('@google-cloud/firestore')
+const db = require('../config/firestore')
 
 const register = async (req, res) => {
     try {
@@ -12,7 +12,8 @@ const register = async (req, res) => {
         const userRef = await db.collection('users').add({
             username,
             password: hashedPassword,
-            createdAt: Timestamp.now()
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now()
         })
 
         return res.status(200).json({
@@ -49,12 +50,7 @@ const login = (req, res) => {
     })
 }
 
-const logout = (req, res) => {
-
-}
-
 module.exports = {
     register,
-    login,
-    logout
+    login
 }
