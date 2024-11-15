@@ -3,15 +3,23 @@ const jwt = require('jsonwebtoken')
 const validateUserApiKey = (req, res, next) => {
     const userApiKey = req.headers['x-api-key']
 
-    if (userApiKey && userApiKey === process.env.API_KEY) {
-        next()
-    } else {
+    if (!userApiKey) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'No API key provided. Authorization required.',
+            data: null
+        })
+    }
+
+    if (userApiKey !== process.env.API_KEY) {
         return res.status(401).json({
             status: 'error',
             message: 'Invalid API key.',
             data: null
         })
     }
+    
+    next()
 }
 
 const validateUserToken = (req, res, next) => {

@@ -1,7 +1,7 @@
 const router = require('express').Router()
-const userController = require('../controllers/userController')
-const { validateUserToken } = require('../middlewares/authMiddleware')
+const { getUserById } = require('../controllers/userController')
 
-router.get('/users/:id', validateUserToken, userController.getUserById)
+router.get('/users/:id', getUserById)
+router.put('/users/:id')
 
 module.exports = router

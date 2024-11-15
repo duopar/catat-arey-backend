@@ -6,8 +6,6 @@ const getUserById = async (req, res) => {
         const userData = (await db.collection('users').doc(userId).get()).data()
         const { username, createdAt, updatedAt } = userData
 
-        console.log(req.decodedUserToken)
-
         return res.status(200).json({
             status: 'success',
             message: 'Successfully retrieved user data.',
