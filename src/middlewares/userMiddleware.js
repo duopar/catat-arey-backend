@@ -1,6 +1,21 @@
 const bcrypt = require('bcrypt')
 const db = require('../config/firestore')
 
+const validateUserIdParam = async (req, res, next) => {
+    const userId = req.params.userId
+    const userDoc = await db.collection('users').doc(userId).get()
+
+    if (!userDoc.exists) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'No user found with the provided ID.',
+            data: null
+        })
+    }
+
+    next()
+}
+
 const validateUserUpdate = async (req, res, next) => {
     const { currentPassword, newPassword, confirmPassword } = req.body
     
@@ -60,4 +75,7 @@ const validateUserUpdate = async (req, res, next) => {
     }
 }
 
-module.exports = validateUserUpdate
+module.exports = {
+    validateUserUpdate,
+    validateUserIdParam
+}

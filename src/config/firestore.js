@@ -4,7 +4,6 @@ const { getFirestore } = require('firebase-admin/firestore')
 const config = {
     credential: cert(process.env.FIRESTORE_CREDENTIALS)
 }
-
 const firebaseApp = initializeApp(config)
 
 const dbProduction = getFirestore(firebaseApp)

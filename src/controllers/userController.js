@@ -1,3 +1,4 @@
+const { Timestamp } = require('@google-cloud/firestore')
 const db = require('../config/firestore')
 
 const getUserById = async (req, res) => {
@@ -32,7 +33,8 @@ const updateUser = async (req, res) => {
         const { hashedNewPassword } = req.userData
 
         await db.collection('users').doc(userId).update({
-            password: hashedNewPassword
+            password: hashedNewPassword,
+            updatedAt: Timestamp.now()
         })
 
         return res.status(200).json({
