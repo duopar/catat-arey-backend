@@ -14,10 +14,10 @@ const {
     deleteProduct
 } = require('../controllers/productController')
 
-productRouter.get('/products', getAllProducts)
-productRouter.get('/products/:productId', validateProductIdParam, getProductById)
-productRouter.post('/products', validateCreateProduct, createProduct)
-productRouter.put('/products/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
-productRouter.delete('/products/:productId', validateProductIdParam, deleteProduct)
+productRouter.get('/', getAllProducts)
+productRouter.get('/:productId', validateProductIdParam, getProductById)
+productRouter.post('/', validateCreateProduct, createProduct)
+productRouter.put('/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
+productRouter.delete('/:productId', validateProductIdParam, deleteProduct)
 
 module.exports = productRouter

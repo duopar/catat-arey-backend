@@ -9,6 +9,7 @@ const {
     validateUserApiKey, 
     validateUserToken
 } = require('./middlewares/authMiddleware')
+
 const apiRouter = require('./routes')
 
 const app = express()

@@ -10,7 +10,7 @@ const {
     updateUser
 } = require('../controllers/userController')
 
-userRouter.get('/users/:userId', validateUserIdParam, getUserById)
-userRouter.patch('/users/:userId', validateUserIdParam, validateUserUpdate, updateUser)
+userRouter.get('/:userId', validateUserIdParam, getUserById)
+userRouter.patch('/:userId', validateUserIdParam, validateUserUpdate, updateUser)
 
 module.exports = userRouter

@@ -4,8 +4,8 @@ const userValidationRouter = require('./userValidationRoutes')
 const userRouter = require('./userRoutes')
 const productRouter = require('./productRoutes')
 
-apiRouter.use(userValidationRouter)
-apiRouter.use(userRouter)
-apiRouter.use(productRouter)
+apiRouter.use('/auth', userValidationRouter)
+apiRouter.use('/users', userRouter)
+apiRouter.use('/products', productRouter)
 
 module.exports = apiRouter

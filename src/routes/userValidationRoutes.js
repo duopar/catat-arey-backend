@@ -10,7 +10,7 @@ const {
     login
 } = require('../controllers/userValidationController')
 
-userValidationRouter.post('/auth/register', validateUserRegistration, register)
-userValidationRouter.post('/auth/login', validateUserLogin, login)
+userValidationRouter.post('/register', validateUserRegistration, register)
+userValidationRouter.post('/login', validateUserLogin, login)
 
 module.exports = userValidationRouter
