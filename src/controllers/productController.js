@@ -15,13 +15,17 @@ const getAllProducts = async (req, res) => {
 
     return res.status(200).json({
         status: 'success',
-        message: 'Product retrieved successfully.',
+        message: 'All product retrieved successfully.',
         data: products
     })
 }
 
 const getProductById = async (req, res) => {
-
+    return res.status(200).json({
+        status: 'success',
+        message: 'Product retrieved successfully.',
+        data: req.productData
+    })
 }
 
 const createProduct = async (req, res) => {

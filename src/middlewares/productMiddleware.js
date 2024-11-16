@@ -13,6 +13,8 @@ const validateProductIdParam = async (req, res, next) => {
         })
     }
 
+    req.productData = productSnapshot.data()
+
     next()
 }
 

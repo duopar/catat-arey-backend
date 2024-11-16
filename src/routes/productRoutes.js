@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { validateCreateProduct } = require('../middlewares/productMiddleware')
+const { validateCreateProduct, validateProductIdParam } = require('../middlewares/productMiddleware')
 const {
     getAllProducts,
     getProductById,
@@ -9,6 +9,7 @@ const {
 } = require('../controllers/productController')
 
 router.get('/products', getAllProducts)
+router.get('/products/:productId', validateProductIdParam, getProductById)
 router.post('/products', validateCreateProduct, createProduct)
 
 module.exports = router
