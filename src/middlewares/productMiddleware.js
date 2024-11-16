@@ -2,7 +2,18 @@ const joi = require('joi')
 const db = require('../config/firestore')
 
 const validateProductIdParam = async (req, res, next) => {
+    const productId = req.params.productId
+    const productSnapshot = await db.collection('products').doc(productId).get()
 
+    if (!productSnapshot.exists) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'No product found with the provided ID.',
+            data: null
+        })
+    }
+
+    next()
 }
 
 const validateCreateProduct = async (req, res, next) => {
@@ -47,5 +58,6 @@ const validateDeleteProduct = async (req, res, next) => {
 }
 
 module.exports = {
+    validateProductIdParam,
     validateCreateProduct
 }
