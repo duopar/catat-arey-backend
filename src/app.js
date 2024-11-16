@@ -9,6 +9,7 @@ const { validateUserApiKey, validateUserToken } = require('./middlewares/authMid
 
 const userValidationRouter = require('./routes/userValidationRoutes')
 const userRouter = require('./routes/userRoutes')
+const productRouter = require('./routes/productRoutes')
 
 const app = express()
 
@@ -27,5 +28,6 @@ app.use((req, res, next) => {
 
 app.use('/api/v1', userValidationRouter)
 app.use('/api/v1', userRouter)
+app.use('/api/v1', productRouter)
 
 module.exports = app

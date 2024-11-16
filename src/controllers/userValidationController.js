@@ -20,8 +20,7 @@ const register = async (req, res) => {
             status: 'success',
             message: 'Registration successful.',
             data: {
-                userId: userRef.id,
-                username
+                userId: userRef.id
             }
         })
     } catch (error) {

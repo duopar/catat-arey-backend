@@ -9,7 +9,7 @@ const getUserById = async (req, res) => {
 
         return res.status(200).json({
             status: 'success',
-            message: 'Successfully retrieved user data.',
+            message: 'User data retrieved successfully.',
             data: {
                 userId,
                 username, 
