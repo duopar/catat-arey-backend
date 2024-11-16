@@ -2,7 +2,22 @@ const { Timestamp } = require('@google-cloud/firestore')
 const db = require('../config/firestore')
 
 const getAllProducts = async (req, res) => {
+    const productSnapshot = await db.collection('products').get()
 
+    products = []
+
+    productSnapshot.forEach(doc => {
+        products.push({
+            productId: doc.id,
+            ...doc.data()
+        })
+    })
+
+    return res.status(200).json({
+        status: 'success',
+        message: 'Product retrieved successfully.',
+        data: products
+    })
 }
 
 const getProductById = async (req, res) => {

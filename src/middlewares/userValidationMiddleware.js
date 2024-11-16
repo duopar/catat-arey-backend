@@ -21,9 +21,9 @@ const validateUserRegistration = async (req, res, next) => {
             })
         }
     
-        const userQuery = await db.collection('users').where('username', '==', username).get()
+        const userSnapshot = await db.collection('users').where('username', '==', username).get()
 
-        if (!userQuery.empty) {
+        if (!userSnapshot.empty) {
             return res.status(400).json({
                 status: 'error',
                 message: 'Username already exists.',
@@ -59,9 +59,9 @@ const validateUserLogin = async (req, res, next) => {
             })
         }
     
-        const userQuery = await db.collection('users').where('username', '==', username).get()
+        const userSnapshot = await db.collection('users').where('username', '==', username).get()
         
-        if (userQuery.empty) {
+        if (userSnapshot.empty) {
             return res.status(401).json({
                 status: 'error',
                 message: 'Invalid credentials: username, or password.',
@@ -69,7 +69,7 @@ const validateUserLogin = async (req, res, next) => {
             })
         }
         
-        const userPassword = userQuery.docs[0].data().password
+        const userPassword = userSnapshot.docs[0].data().password
 
         if (!(await bcrypt.compare(password, userPassword))) {
             return res.status(401).json({
@@ -79,7 +79,7 @@ const validateUserLogin = async (req, res, next) => {
             })
         }
 
-        const userId = userQuery.docs[0].id
+        const userId = userSnapshot.docs[0].id
 
         req.userData = {
             userId,

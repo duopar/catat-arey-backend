@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { validateCreateProduct } = require('../middlewares/productMiddleware')
 const {
     getAllProducts,
     getProductById,
@@ -7,6 +8,7 @@ const {
     deleteProduct
 } = require('../controllers/productController')
 
-router.post('/products', createProduct)
+router.get('/products', getAllProducts)
+router.post('/products', validateCreateProduct, createProduct)
 
 module.exports = router
