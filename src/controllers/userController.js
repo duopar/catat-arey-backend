@@ -2,7 +2,7 @@ const db = require('../config/firestore')
 
 const getUserById = async (req, res) => {
     try {
-        const userId = req.params.id
+        const userId = req.params.userId
         const userData = (await db.collection('users').doc(userId).get()).data()
         const { username, createdAt, updatedAt } = userData
 
@@ -26,6 +26,32 @@ const getUserById = async (req, res) => {
     }
 }
 
+const updateUser = async (req, res) => {
+    try {
+        const userId = req.params.userId
+        const { hashedNewPassword } = req.userData
+
+        await db.collection('users').doc(userId).update({
+            password: hashedNewPassword
+        })
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Password updated successfully.',
+            data: null
+        })
+    } catch (error) {
+        console.error("Error updating password:", error)    
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to update password due to server error.',
+            data: null
+        })
+    }
+
+}
+
 module.exports = {
-    getUserById
+    getUserById,
+    updateUser
 }

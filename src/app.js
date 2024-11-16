@@ -7,8 +7,8 @@ const cors = require('cors')
 
 const { validateUserApiKey, validateUserToken } = require('./middlewares/authMiddleware')
 
-const userValidationRoutes = require('./routes/userValidationRoutes')
-const userRoutes = require('./routes/userRoutes')
+const userValidationRouter = require('./routes/userValidationRoutes')
+const userRouter = require('./routes/userRoutes')
 
 const app = express()
 
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
     validateUserToken(req, res, next)
 })
 
-app.use('/api/v1', userValidationRoutes)
-app.use('/api/v1', userRoutes)
+app.use('/api/v1', userValidationRouter)
+app.use('/api/v1', userRouter)
 
 module.exports = app

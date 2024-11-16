@@ -16,7 +16,7 @@ const validateUserRegistration = async (req, res, next) => {
         if (password !== confirmPassword) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Password and confirmPassword do not match.',
+                message: 'password and confirmPassword do not match.',
                 data: null
             })
         }
