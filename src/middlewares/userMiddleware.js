@@ -13,6 +13,10 @@ const validateUserIdParam = async (req, res, next) => {
         })
     }
 
+    req.userData = {
+        userId
+    }
+
     next()
 }
 
@@ -60,9 +64,7 @@ const validateUserUpdate = async (req, res, next) => {
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10)
 
-        req.userData = {
-            hashedNewPassword
-        }
+        req.userData.hashedNewPassword = hashedNewPassword
 
         next()
     } catch (error) {

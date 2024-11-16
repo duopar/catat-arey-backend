@@ -3,7 +3,7 @@ const db = require('../config/firestore')
 
 const getUserById = async (req, res) => {
     try {
-        const userId = req.params.userId
+        const userId = req.userData.userId
         const userData = (await db.collection('users').doc(userId).get()).data()
         const { username, createdAt, updatedAt } = userData
 
@@ -29,8 +29,7 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const userId = req.params.userId
-        const { hashedNewPassword } = req.userData
+        const { userId, hashedNewPassword } = req.userData
 
         await db.collection('users').doc(userId).update({
             password: hashedNewPassword,
