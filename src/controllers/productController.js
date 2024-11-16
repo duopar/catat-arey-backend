@@ -4,8 +4,16 @@ const db = require('../config/firestore')
 const getAllProducts = async (req, res) => {
     try {
         const productSnapshot = await db.collection('products').get()
+
+        if (productSnapshot.empty) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'No products found.',
+                data: null
+            })
+        }
     
-        products = []
+        let products = []
     
         productSnapshot.forEach(doc => {
             products.push({
@@ -23,7 +31,7 @@ const getAllProducts = async (req, res) => {
         console.error("Error retrieving all product:", error)
         return res.status(500).json({
             status: 'error',
-            message: 'Failed to retrieved all product due to server error.',
+            message: 'Failed to retrieve all product due to server error.',
             data: null
         })
     }

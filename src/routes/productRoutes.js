@@ -1,5 +1,11 @@
-const router = require('express').Router()
-const { validateCreateProduct, validateProductIdParam, validateUpdateProduct } = require('../middlewares/productMiddleware')
+const productRouter = require('express').Router()
+
+const {
+    validateCreateProduct,
+    validateProductIdParam,
+    validateUpdateProduct
+} = require('../middlewares/productMiddleware')
+
 const {
     getAllProducts,
     getProductById,
@@ -8,10 +14,10 @@ const {
     deleteProduct
 } = require('../controllers/productController')
 
-router.get('/products', getAllProducts)
-router.get('/products/:productId', validateProductIdParam, getProductById)
-router.post('/products', validateCreateProduct, createProduct)
-router.put('/products/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
-router.delete('/products/:productId', validateProductIdParam, deleteProduct)
+productRouter.get('/products', getAllProducts)
+productRouter.get('/products/:productId', validateProductIdParam, getProductById)
+productRouter.post('/products', validateCreateProduct, createProduct)
+productRouter.put('/products/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
+productRouter.delete('/products/:productId', validateProductIdParam, deleteProduct)
 
-module.exports = router
+module.exports = productRouter

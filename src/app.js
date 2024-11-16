@@ -5,11 +5,11 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors')
 
-const { validateUserApiKey, validateUserToken } = require('./middlewares/authMiddleware')
-
-const userValidationRouter = require('./routes/userValidationRoutes')
-const userRouter = require('./routes/userRoutes')
-const productRouter = require('./routes/productRoutes')
+const {
+    validateUserApiKey, 
+    validateUserToken
+} = require('./middlewares/authMiddleware')
+const apiRouter = require('./routes')
 
 const app = express()
 
@@ -26,8 +26,6 @@ app.use((req, res, next) => {
     validateUserToken(req, res, next)
 })
 
-app.use('/api/v1', userValidationRouter)
-app.use('/api/v1', userRouter)
-app.use('/api/v1', productRouter)
+app.use('/api/v1', apiRouter)
 
 module.exports = app
