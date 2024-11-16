@@ -103,7 +103,24 @@ const updateProduct = async (req, res) => {
 }
 
 const deleteProduct = async (req, res) => {
+    try {
+        const productId = req.params.productId
 
+        await db.collection('products').doc(productId).delete()
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Product deleted successfully.',
+            data: null
+        })
+    } catch (error) {
+        console.error("Error deleting product:", error)
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to delete product due to server error.',
+            data: null
+        })
+    }
 }
 
 module.exports = {

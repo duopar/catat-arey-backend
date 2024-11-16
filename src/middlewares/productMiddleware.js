@@ -87,10 +87,6 @@ const validateUpdateProduct = async (req, res, next) => {
     next()
 }
 
-const validateDeleteProduct = async (req, res, next) => {
-
-}
-
 module.exports = {
     validateProductIdParam,
     validateCreateProduct,

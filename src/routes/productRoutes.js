@@ -12,5 +12,6 @@ router.get('/products', getAllProducts)
 router.get('/products/:productId', validateProductIdParam, getProductById)
 router.post('/products', validateCreateProduct, createProduct)
 router.put('/products/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
+router.delete('/products/:productId', validateProductIdParam, deleteProduct)
 
 module.exports = router
