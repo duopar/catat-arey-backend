@@ -10,7 +10,7 @@ ARG NODE_VERSION=22.0.0
 
 FROM node:${NODE_VERSION}-alpine as base
 WORKDIR /usr/src/app
-EXPOSE 3000
+EXPOSE 8080
 
 FROM base as dev
 RUN --mount=type=bind,source=package.json,target=package.json \
