@@ -7,13 +7,13 @@ Used to authenticate users.
   - **Headers**:
     - `X-API-Key: <api-key>`
   - **Body**:
-  ```json
-  {
-    "username": "string", 
-    "password": "string",
-    "confirmPassword": "string"
-  }
-  ```
+    ```json
+    {
+      "username": "string", 
+      "password": "string",
+      "confirmPassword": "string"
+    }
+    ```
 
 - ### POST `/auth/login`
   - **Description**: Authenticate user and create token.
