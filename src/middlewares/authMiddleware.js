@@ -23,7 +23,25 @@ const validateUserApiKey = (req, res, next) => {
 }
 
 const validateUserToken = (req, res, next) => {
-    const userToken = req.headers['authorization'] //.split(' ')[1]
+    const authHeader = req.headers['authorization']
+
+    if (!authHeader) {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Authorization header missing.',
+            data: null
+        })
+    }
+
+    const [ bearer, userToken ] = authHeader.split(' ')
+
+    if (bearer !== 'Bearer') {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Invalid token format. Use "Bearer <your-token>"',
+            data: null
+        })
+    }
 
     if (!userToken) {
         return res.status(401).json({
