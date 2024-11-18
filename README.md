@@ -1,51 +1,110 @@
 ### 1. **Authentication Endpoints**
-   Digunakan untuk registrasi dan otentikasi pengguna.
 
-   - **POST** `/auth/register`
-     - **Deskripsi**: Mendaftarkan pengguna baru.
-     - **Body**: `{ "name": "string", "password": "string", "confirmPassword": "string"}`
+Used to authenticate users.
 
-   - **POST** `/auth/login`
-     - **Deskripsi**: Mengotentikasi pengguna dan menghasilkan token.
-     - **Body**: `{ "email": "string", "password": "string" }`
+- ### POST `/auth/register`
+  - **Description**: Registering new user.
+  - **Headers**:
+  - `X-API-Key: <api-key>`
+    - **Body**:
+    ```json
+    {
+      "username": "string", 
+      "password": "string",
+      "confirmPassword": "string"
+    }
+    ```
+
+- ### POST `/auth/login`
+  - **Description**: Authenticate user and create token.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+  - **Body**:
+      ```json
+      {
+        "username": "string", 
+        "password": "string" 
+      }
+      ```
 
 ---
 
 ### 2. **User Management Endpoints**
-   Digunakan untuk mengelola data pengguna.
+   
+Used to manage user data.
 
-   - **GET** `/users/{userId}`
-     - **Deskripsi**: Mendapatkan detail pengguna.
-     - **Headers**: `Authorization: Bearer <token>`
+- ### **GET** `/users/{userId}`
+  - **Description**: Get user details.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
 
-   - **PUT** `/users/{userId}`
-     - **Deskripsi**: Memperbarui informasi pengguna.
-     - **Headers**: `Authorization: Bearer <token>`
-     - **Body**: `{ "name": "string", "email": "string", "settings": { "notificationEnabled": "boolean" } }`
+- ### **PATCH** `/users/{userId}`
+  - **Description**: Update user password.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
+  - **Body**:
+    ```json
+    {
+      "currentPassword": "string",
+      "newPassword": "string",
+      "confirmPassword": "string"
+    }
+    ```
 
 ---
 
 ### 3. **Product Management Endpoints**
-   Digunakan untuk mengelola inventaris produk.
 
-   - **GET** `/products`
-     - **Deskripsi**: Mendapatkan daftar semua produk.
-     - **Headers**: `Authorization: Bearer <token>`
+Used to manage product inventory.
 
-   - **GET** `/products/{productId}`
-     - **Deskripsi**: Mendapatkan detail produk berdasarkan ID.
-     - **Headers**: `Authorization: Bearer <token>`
+- ### **GET** `/products`
+  - **Deskripsi**: Get a list of all products.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
 
-   - **POST** `/products`
-     - **Deskripsi**: Menambahkan produk baru ke dalam inventaris.
-     - **Headers**: `Authorization: Bearer <token>`
-     - **Body**: `{ "name": "string", "sku": "string", "category": "string", "price": "number", "stockLevel": "number", "reorderThreshold": "number", "reorderAmount": "number" }`
+- **GET** `/products/{productId}`
+  - **Deskripsi**: Get product details by ID.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
 
-   - **PUT** `/products/{productId}`
-     - **Deskripsi**: Memperbarui informasi produk.
-     - **Headers**: `Authorization: Bearer <token>`
-     - **Body**: `{ "name": "string", "price": "number", "stockLevel": "number", "reorderThreshold": "number", "reorderAmount": "number" }`
+- **POST** `/products`
+  - **Deskripsi**: Add new product to inventory.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
+  - **Body**:
+    ```json
+    {
+      "name": "string",
+      "category": "string",
+      "price": "number",
+      "stockLevel": "number",
+      "restockThreshold": "number"
+    }
+    ```
 
-   - **DELETE** `/products/{productId}`
-     - **Deskripsi**: Menghapus produk dari inventaris.
-     - **Headers**: `Authorization: Bearer <token>`
+- **PUT** `/products/{productId}`
+  - **Deskripsi**: Update product information.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
+  - **Body**:
+    ```json
+    {
+      "name": "string (optional)",
+      "category": "string (optional)",
+      "price": "number (optional)",
+      "stockLevel": "number (optional)",
+      "restockThreshold": "number (optional)"
+    }
+    ```
+
+- **DELETE** `/products/{productId}`
+  - **Deskripsi**: Delete product from inventory.
+  - **Headers**:
+    - `X-API-Key: <api-key>`
+    - `Authorization: Bearer <token>`
