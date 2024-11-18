@@ -5,15 +5,15 @@ Used to authenticate users.
 - ### POST `/auth/register`
   - **Description**: Registering new user.
   - **Headers**:
-  - `X-API-Key: <api-key>`
-    - **Body**:
-    ```json
-    {
-      "username": "string", 
-      "password": "string",
-      "confirmPassword": "string"
-    }
-    ```
+    - `X-API-Key: <api-key>`
+  - **Body**:
+  ```json
+  {
+    "username": "string", 
+    "password": "string",
+    "confirmPassword": "string"
+  }
+  ```
 
 - ### POST `/auth/login`
   - **Description**: Authenticate user and create token.
