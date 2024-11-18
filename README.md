@@ -1,8 +1,8 @@
-### 1. **Authentication Endpoints**
+## 1. **Authentication Endpoints**
 
 Used to authenticate users.
 
-- ### POST `/auth/register`
+- ### **POST** `/auth/register`
   - **Description**: Registering new user.
   - **Headers**:
     - `X-API-Key: <api-key>`
@@ -15,7 +15,7 @@ Used to authenticate users.
     }
     ```
 
-- ### POST `/auth/login`
+- ### **POST** `/auth/login`
   - **Description**: Authenticate user and create token.
   - **Headers**:
     - `X-API-Key: <api-key>`
@@ -26,10 +26,9 @@ Used to authenticate users.
         "password": "string" 
       }
       ```
-
 ---
 
-### 2. **User Management Endpoints**
+## 2. **User Management Endpoints**
    
 Used to manage user data.
 
@@ -55,7 +54,7 @@ Used to manage user data.
 
 ---
 
-### 3. **Product Management Endpoints**
+## 3. **Product Management Endpoints**
 
 Used to manage product inventory.
 
@@ -65,13 +64,13 @@ Used to manage product inventory.
     - `X-API-Key: <api-key>`
     - `Authorization: Bearer <token>`
 
-- **GET** `/products/{productId}`
+- ### **GET** `/products/{productId}`
   - **Deskripsi**: Get product details by ID.
   - **Headers**:
     - `X-API-Key: <api-key>`
     - `Authorization: Bearer <token>`
 
-- **POST** `/products`
+- ### **POST** `/products`
   - **Deskripsi**: Add new product to inventory.
   - **Headers**:
     - `X-API-Key: <api-key>`
@@ -87,7 +86,7 @@ Used to manage product inventory.
     }
     ```
 
-- **PUT** `/products/{productId}`
+- ### **PUT** `/products/{productId}`
   - **Deskripsi**: Update product information.
   - **Headers**:
     - `X-API-Key: <api-key>`
@@ -103,7 +102,7 @@ Used to manage product inventory.
     }
     ```
 
-- **DELETE** `/products/{productId}`
+- ### **DELETE** `/products/{productId}`
   - **Deskripsi**: Delete product from inventory.
   - **Headers**:
     - `X-API-Key: <api-key>`
