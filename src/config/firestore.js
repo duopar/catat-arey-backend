@@ -1,10 +1,7 @@
-const { initializeApp, cert } = require('firebase-admin/app')
+const { initializeApp } = require('firebase-admin/app')
 const { getFirestore } = require('firebase-admin/firestore')
 
-const config = {
-    credential: cert(process.env.FIRESTORE_CREDENTIALS)
-}
-const firebaseApp = initializeApp(config)
+const firebaseApp = initializeApp()
 
 const dbProduction = getFirestore(firebaseApp)
 const dbDevelopment = getFirestore(firebaseApp, 'development')
