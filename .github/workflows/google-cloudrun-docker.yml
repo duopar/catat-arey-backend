@@ -36,7 +36,7 @@ on:
 env:
   PROJECT_ID: 'catat-arey' # TODO: update to your Google Cloud project ID
   REGION: 'asia-southeast2' # TODO: update to your region
-  SERVICE: 'catat-arey-tes-cd' # TODO: update to your service name
+  SERVICE: 'catat-arey-backend' # TODO: update to your service name
   WORKLOAD_IDENTITY_PROVIDER: 'projects/130212893572/locations/global/workloadIdentityPools/github-actions/providers/catat-arey-backend' # TODO: update to your workload identity provider
 
 jobs:
