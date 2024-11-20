@@ -31,8 +31,7 @@ name: 'Build and Deploy to Cloud Run'
 
 on:
   push:
-    branches:
-      - '"test/cd-pipeline"'
+    branches: ["test/cd-pipeline"]
 
 env:
   PROJECT_ID: 'catat-arey' # TODO: update to your Google Cloud project ID
