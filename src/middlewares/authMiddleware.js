@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
+const getSecret = require('../config/secretManager')
 
-const validateUserApiKey = (req, res, next) => {
+const validateUserApiKey = async (req, res, next) => {
     const userApiKey = req.headers['x-api-key']
 
     if (!userApiKey) {
@@ -11,7 +12,9 @@ const validateUserApiKey = (req, res, next) => {
         })
     }
 
-    if (userApiKey !== process.env.API_KEY) {
+    const API_KEY = await getSecret('API_KEY')
+
+    if (userApiKey !== API_KEY) {
         return res.status(401).json({
             status: 'error',
             message: 'Invalid API key.',
@@ -22,7 +25,7 @@ const validateUserApiKey = (req, res, next) => {
     next()
 }
 
-const validateUserToken = (req, res, next) => {
+const validateUserToken = async (req, res, next) => {
     const authHeader = req.headers['authorization']
 
     if (!authHeader) {
@@ -52,7 +55,9 @@ const validateUserToken = (req, res, next) => {
     }
 
     try {
-        const decodedUserToken = jwt.verify(userToken, process.env.JWT_SECRET)
+        const JWT_SECRET = await getSecret('JWT_SECRET')
+
+        const decodedUserToken = jwt.verify(userToken, JWT_SECRET)
 
         req.decodedUserToken = decodedUserToken
 
