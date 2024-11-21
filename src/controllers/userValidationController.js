@@ -36,11 +36,11 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const { userId, username } = req.userData
+    const { userId, username, userRole } = req.userData
 
     const JWT_SECRET = await getSecret('JWT_SECRET')
 
-    const token = jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '1h' })
+    const token = jwt.sign({ userId, username, userRole }, JWT_SECRET, { expiresIn: '1h' })
 
     return res.status(200).json({
         status: 'success',

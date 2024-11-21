@@ -89,10 +89,12 @@ const validateUserLogin = async (req, res, next) => {
         }
 
         const userId = userSnapshot.docs[0].id
+        const userRole = userSnapshot.docs[0].data().role
 
         req.userData = {
             userId,
-            username
+            username,
+            userRole
         }
     
         next()
