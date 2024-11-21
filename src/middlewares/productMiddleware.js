@@ -1,6 +1,20 @@
 const joi = require('joi')
 const db = require('../config/firestore')
 
+const validateUserRole = (req, res, next) => {
+    const decodedUserRole = req.decodedUserToken.userRole
+
+    if (decodedUserRole !== 'owner') {
+        return res.status(401).json({
+            status: 'error',
+            message: 'Access restricted: only users with the "owner" role can add, update, or delete products.',
+            data: null
+        })
+    }
+
+    next()
+}
+
 const validateProductIdParam = async (req, res, next) => {
     const productId = req.params.productId
     const productSnapshot = await db.collection('products').doc(productId).get()
@@ -88,6 +102,7 @@ const validateUpdateProduct = async (req, res, next) => {
 }
 
 module.exports = {
+    validateUserRole,
     validateProductIdParam,
     validateCreateProduct,
     validateUpdateProduct

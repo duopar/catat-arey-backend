@@ -1,6 +1,7 @@
 const productRouter = require('express').Router()
 
 const {
+    validateUserRole,
     validateCreateProduct,
     validateProductIdParam,
     validateUpdateProduct
@@ -16,8 +17,8 @@ const {
 
 productRouter.get('/', getAllProducts)
 productRouter.get('/:productId', validateProductIdParam, getProductById)
-productRouter.post('/', validateCreateProduct, createProduct)
-productRouter.put('/:productId', validateProductIdParam, validateUpdateProduct, updateProduct)
-productRouter.delete('/:productId', validateProductIdParam, deleteProduct)
+productRouter.post('/', validateUserRole, validateCreateProduct, createProduct)
+productRouter.put('/:productId', validateUserRole, validateProductIdParam, validateUpdateProduct, updateProduct)
+productRouter.delete('/:productId', validateUserRole, validateProductIdParam, deleteProduct)
 
 module.exports = productRouter
