@@ -11,6 +11,7 @@ Used to authenticate users.
     {
       "username": "string", 
       "password": "string",
+      "role": "string (enum: 'owner' or 'employee')",
       "confirmPassword": "string"
     }
     ```
@@ -71,7 +72,7 @@ Used to manage product inventory.
     - `Authorization: Bearer <token>`
 
 - ### **POST** `/products`
-  - **Deskripsi**: Add new product to inventory.
+  - **Deskripsi**: Add new product to inventory. **Only users with 'owner' role can add products**.
   - **Headers**:
     - `X-API-Key: <api-key>`
     - `Authorization: Bearer <token>`
@@ -87,7 +88,7 @@ Used to manage product inventory.
     ```
 
 - ### **PUT** `/products/{productId}`
-  - **Deskripsi**: Update product information.
+  - **Deskripsi**: Update product information. **Only users with 'owner' role can update products**.
   - **Headers**:
     - `X-API-Key: <api-key>`
     - `Authorization: Bearer <token>`
@@ -103,7 +104,7 @@ Used to manage product inventory.
     ```
 
 - ### **DELETE** `/products/{productId}`
-  - **Deskripsi**: Delete product from inventory.
+  - **Deskripsi**: Delete product from inventory. **Only users with 'owner' role can delete products**.
   - **Headers**:
     - `X-API-Key: <api-key>`
     - `Authorization: Bearer <token>`
