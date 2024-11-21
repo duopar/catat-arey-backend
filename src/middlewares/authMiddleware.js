@@ -1,6 +1,12 @@
 const jwt = require('jsonwebtoken')
 const getSecret = require('../config/secretManager')
 
+let API_KEY = null
+getSecret('API_KEY').then(secret => API_KEY = secret)
+
+let JWT_SECRET = null
+getSecret('JWT_SECRET').then(secret => JWT_SECRET = secret)
+
 const validateUserApiKey = async (req, res, next) => {
     const userApiKey = req.headers['x-api-key']
 
@@ -11,8 +17,6 @@ const validateUserApiKey = async (req, res, next) => {
             data: null
         })
     }
-
-    const API_KEY = await getSecret('API_KEY')
 
     if (userApiKey !== API_KEY) {
         return res.status(401).json({
@@ -55,8 +59,6 @@ const validateUserToken = async (req, res, next) => {
     }
 
     try {
-        const JWT_SECRET = await getSecret('JWT_SECRET')
-
         const decodedUserToken = jwt.verify(userToken, JWT_SECRET)
 
         req.decodedUserToken = decodedUserToken
