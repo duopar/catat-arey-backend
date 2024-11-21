@@ -6,13 +6,14 @@ const getSecret = require('../config/secretManager')
 
 const register = async (req, res) => {
     try {
-        const { username, password } = req.userData
+        const { username, password, role } = req.userData
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const userRef = await db.collection('users').add({
             username,
             password: hashedPassword,
+            role,
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now()
         })

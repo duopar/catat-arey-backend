@@ -6,9 +6,9 @@ on:
 
 env:
   PROJECT_ID: 'catat-arey'
-  REGION: 'asia-southeast2'
-  GAR_REPOSITORY: 'catat-arey-backend'
   SERVICE: 'catat-arey'
+  GAR_REPOSITORY: 'catat-arey-images'
+  REGION: 'asia-southeast2'
   WORKLOAD_IDENTITY_PROVIDER: 'projects/130212893572/locations/global/workloadIdentityPools/github-actions/providers/catat-arey-backend'
 
 jobs:

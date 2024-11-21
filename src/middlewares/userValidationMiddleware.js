@@ -3,12 +3,12 @@ const db = require('../config/firestore')
 
 const validateUserRegistration = async (req, res, next) => {
     try {
-        const { username, password, confirmPassword } = req.body
+        const { username, password, confirmPassword, role } = req.body
 
-        if (!username || !password || !confirmPassword) {
+        if (!username || !password || !confirmPassword || !role) {
             return res.status(400).json({
                 status: 'error',
-                message: 'Missing required fields: username, password, or confirmPassword.',
+                message: 'Missing required fields: username, password, confirmPassword, or role.',
                 data: null
             })
         }
@@ -17,6 +17,14 @@ const validateUserRegistration = async (req, res, next) => {
             return res.status(400).json({
                 status: 'error',
                 message: 'password and confirmPassword do not match.',
+                data: null
+            })
+        }
+
+        if (role !== 'owner' && role !== 'employee') {
+            return res.status(400).json({
+                status: 'error',
+                message: 'role must be "owner" or "employee".',
                 data: null
             })
         }
@@ -33,7 +41,8 @@ const validateUserRegistration = async (req, res, next) => {
 
         req.userData = {
             username,
-            password
+            password,
+            role
         }
 
         next()
