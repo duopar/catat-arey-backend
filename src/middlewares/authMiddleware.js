@@ -2,10 +2,12 @@ const jwt = require('jsonwebtoken')
 const getSecret = require('../config/secretManager')
 
 let API_KEY = null
-getSecret('API_KEY').then(secret => API_KEY = secret)
-
 let JWT_SECRET = null
-getSecret('JWT_SECRET').then(secret => JWT_SECRET = secret)
+
+const initializeSecrets = async () => {
+    API_KEY = await getSecret('API_KEY')
+    JWT_SECRET = await getSecret('JWT_SECRET')
+}
 
 const validateUserApiKey = async (req, res, next) => {
     const userApiKey = req.headers['x-api-key']
@@ -82,6 +84,7 @@ const validateUserToken = async (req, res, next) => {
 }
 
 module.exports = { 
+    initializeSecrets,
     validateUserApiKey, 
     validateUserToken 
 }
