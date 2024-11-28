@@ -36,9 +36,9 @@ const validateCreateProduct = async (req, res, next) => {
     const schema = joi.object({
         name: joi.string().required(),
         category: joi.string().required(),
-        price: joi.number().strict().required(),
-        stockLevel: joi.number().strict().required(),
-        restockThreshold: joi.number().strict().required()
+        price: joi.number().integer().strict().required(),
+        stockLevel: joi.number().integer().strict().required(),
+        restockThreshold: joi.number().integer().strict().required(),
     })
 
     const { error } = schema.validate(req.body)
@@ -69,9 +69,9 @@ const validateUpdateProduct = async (req, res, next) => {
     const schema = joi.object({
         name: joi.string(),
         category: joi.string(),
-        price: joi.number().strict(),
-        stockLevel: joi.number().strict(),
-        restockThreshold: joi.number().strict()
+        price: joi.number().integer().strict(),
+        stockLevel: joi.number().integer().strict(),
+        restockThreshold: joi.number().integer().strict()
     })
 
     const { error } = schema.validate(req.body)
@@ -101,9 +101,48 @@ const validateUpdateProduct = async (req, res, next) => {
     next()
 }
 
+const validateCreateProductLog = async (req, res, next) => {
+    const currentStockLevel = req.productSnapshot.data().stockLevel
+
+    const schema = joi.object({
+        stockIn: joi.number().integer().strict().min(0).required(),
+        stockOut: joi
+            .number()
+            .integer()
+            .strict()
+            .min(0)
+            .max(currentStockLevel)
+            .required()
+            .messages({
+                'number.max': '"stockOut" must be less than or equal to current product stock level'
+            })
+    }).custom((value, helpers) => {
+        const { stockIn, stockOut } = value
+
+        if (stockIn === 0 && stockOut === 0) {
+            return helpers.message('"stockIn" and "stockOut" cannot both be 0 at the same time')
+        }
+
+        return value
+    })
+
+    const { error } = schema.validate(req.body)
+
+    if (error) {
+        return res.status(400).json({
+            status: 'error',
+            message: error.details[0].message,
+            data: null
+        })
+    }
+
+    next()
+}
+
 module.exports = {
     validateUserRole,
     validateProductIdParam,
     validateCreateProduct,
-    validateUpdateProduct
+    validateUpdateProduct,
+    validateCreateProductLog
 }
