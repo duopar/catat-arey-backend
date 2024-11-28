@@ -28,23 +28,64 @@ const getAllProducts = async (req, res) => {
             data: products
         })
     } catch (error) {
-        console.error("Error retrieving all product:", error)
+        console.error("Error retrieving all products:", error)
         return res.status(500).json({
             status: 'error',
-            message: 'Failed to retrieve all product due to server error.',
+            message: 'Failed to retrieve all products due to server error.',
             data: null
         })
     }
 }
 
 const getProductById = async (req, res) => {
-    const product = req.productSnapshot.data()
+    try {
+        const productId = req.params.productId
+        const product = req.productSnapshot.data()
 
-    return res.status(200).json({
-        status: 'success',
-        message: 'Product retrieved successfully.',
-        data: product
-    })
+        const startOfDay = new Date()
+        startOfDay.setHours(0, 0, 0, 0)
+
+        const endOfDay = new Date()
+        endOfDay.setHours(23, 59, 59, 999)
+
+        const startTimestamp = Timestamp.fromDate(startOfDay)
+        const endTimestamp = Timestamp.fromDate(endOfDay)
+
+        const inventoryLogSnapshot = await db.collection('inventoryLogs')
+            .where('productId', '==', productId)
+            .where('createdAt', '>=', startTimestamp)
+            .where('createdAt', '<=', endTimestamp)
+            .get()
+
+        let stockInToday = 0
+        let stockOutToday = 0
+
+        if (!inventoryLogSnapshot.empty) {
+            inventoryLogSnapshot.forEach(doc => {
+                if (doc.data().changeType === 'stockIn') {
+                    stockInToday += doc.data().stockChange
+                } else {
+                    stockOutToday += (-1 * doc.data().stockChange)
+                }
+            })
+        }
+
+        product.stockInToday = stockInToday
+        product.stockOutToday = stockOutToday
+    
+        return res.status(200).json({
+            status: 'success',
+            message: 'Product retrieved successfully.',
+            data: product
+        })
+    } catch (error) {
+        console.error("Error retrieving the product:", error)
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to retrieve the product due to server error.',
+            data: null
+        })
+    }
 }
 
 const createProduct = async (req, res) => {
