@@ -1,9 +1,10 @@
-const { initializeApp } = require('firebase-admin/app')
-const { getFirestore } = require('firebase-admin/firestore')
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
-const firebaseApp = initializeApp()
+const firebaseApp = initializeApp();
 
-const dbProduction = getFirestore(firebaseApp)
-const dbDevelopment = getFirestore(firebaseApp, 'development')
+const dbProduction = getFirestore(firebaseApp);
+const dbDevelopment = getFirestore(firebaseApp, 'development');
 
-module.exports = process.env.NODE_ENV === 'production' ? dbProduction : dbDevelopment
+module.exports =
+  process.env.NODE_ENV === 'production' ? dbProduction : dbDevelopment;

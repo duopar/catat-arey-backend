@@ -1,90 +1,90 @@
-const jwt = require('jsonwebtoken')
-const getSecret = require('../config/secretManager')
+const jwt = require('jsonwebtoken');
+const getSecret = require('../config/secretManager');
 
-let API_KEY = null
-let JWT_SECRET = null
+let API_KEY = null;
+let JWT_SECRET = null;
 
 const initializeSecrets = async () => {
-    API_KEY = await getSecret('API_KEY')
-    JWT_SECRET = await getSecret('JWT_SECRET')
-}
+  API_KEY = await getSecret('API_KEY');
+  JWT_SECRET = await getSecret('JWT_SECRET');
+};
 
 const validateUserApiKey = async (req, res, next) => {
-    const userApiKey = req.headers['x-api-key']
+  const userApiKey = req.headers['x-api-key'];
 
-    if (!userApiKey) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'No API key provided. Authorization required.',
-            data: null
-        })
-    }
+  if (!userApiKey) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'No API key provided. Authorization required.',
+      data: null,
+    });
+  }
 
-    if (userApiKey !== API_KEY) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'Invalid API key.',
-            data: null
-        })
-    }
-    
-    next()
-}
+  if (userApiKey !== API_KEY) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid API key.',
+      data: null,
+    });
+  }
+
+  next();
+};
 
 const validateUserToken = async (req, res, next) => {
-    const authHeader = req.headers['authorization']
+  const authHeader = req.headers['authorization'];
 
-    if (!authHeader) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'Authorization header missing.',
-            data: null
-        })
+  if (!authHeader) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Authorization header missing.',
+      data: null,
+    });
+  }
+
+  const [bearer, userToken] = authHeader.split(' ');
+
+  if (bearer !== 'Bearer') {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid token format. Use "Bearer <your-token>"',
+      data: null,
+    });
+  }
+
+  if (!userToken) {
+    return res.status(401).json({
+      status: 'error',
+      message: 'No token provided. Authorization required.',
+      data: null,
+    });
+  }
+
+  try {
+    const decodedUserToken = jwt.verify(userToken, JWT_SECRET);
+
+    req.decodedUserToken = decodedUserToken;
+
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Token has expired.',
+        data: null,
+      });
     }
 
-    const [ bearer, userToken ] = authHeader.split(' ')
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid token.',
+      data: null,
+    });
+  }
+};
 
-    if (bearer !== 'Bearer') {
-        return res.status(401).json({
-            status: 'error',
-            message: 'Invalid token format. Use "Bearer <your-token>"',
-            data: null
-        })
-    }
-
-    if (!userToken) {
-        return res.status(401).json({
-            status: 'error',
-            message: 'No token provided. Authorization required.',
-            data: null
-        })
-    }
-
-    try {
-        const decodedUserToken = jwt.verify(userToken, JWT_SECRET)
-
-        req.decodedUserToken = decodedUserToken
-
-        next()
-    } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                status: 'error',
-                message: 'Token has expired.',
-                data: null
-            })
-        }
-
-        return res.status(401).json({
-            status: 'error',
-            message: 'Invalid token.',
-            data: null
-        })
-    }
-}
-
-module.exports = { 
-    initializeSecrets,
-    validateUserApiKey, 
-    validateUserToken 
-}
+module.exports = {
+  initializeSecrets,
+  validateUserApiKey,
+  validateUserToken,
+};

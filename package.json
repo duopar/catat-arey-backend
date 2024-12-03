@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_ENV=production node src/server.js",
-    "dev": "NODE_ENV=development nodemon src/server.js"
+    "dev": "NODE_ENV=development nodemon src/server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "author": "haidarmaula",
   "license": "ISC",
@@ -24,6 +26,12 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.13.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.4.1"
   }
 }

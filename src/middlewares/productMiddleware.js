@@ -1,148 +1,160 @@
-const joi = require('joi')
-const db = require('../config/firestore')
+const joi = require('joi');
+const db = require('../config/firestore');
 
 const validateUserRole = (req, res, next) => {
-    const decodedUserRole = req.decodedUserToken.userRole
+  const decodedUserRole = req.decodedUserToken.userRole;
 
-    if (decodedUserRole !== 'owner') {
-        return res.status(401).json({
-            status: 'error',
-            message: 'Access restricted: only users with the "owner" role can add, update, or delete products.',
-            data: null
-        })
-    }
+  if (decodedUserRole !== 'owner') {
+    return res.status(401).json({
+      status: 'error',
+      message:
+        'Access restricted: only users with the "owner" role can add, update, or delete products.',
+      data: null,
+    });
+  }
 
-    next()
-}
+  next();
+};
 
 const validateProductIdParam = async (req, res, next) => {
-    const productId = req.params.productId
-    const productSnapshot = await db.collection('products').doc(productId).get()
+  const productId = req.params.productId;
+  const productSnapshot = await db.collection('products').doc(productId).get();
 
-    if (!productSnapshot.exists) {
-        return res.status(404).json({
-            status: 'error',
-            message: 'No product found with the provided ID.',
-            data: null
-        })
-    }
+  if (!productSnapshot.exists) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'No product found with the provided ID.',
+      data: null,
+    });
+  }
 
-    req.productSnapshot = productSnapshot
+  req.productSnapshot = productSnapshot;
 
-    next()
-}
+  next();
+};
 
 const validateCreateProduct = async (req, res, next) => {
-    const schema = joi.object({
-        name: joi.string().required(),
-        category: joi.string().required(),
-        price: joi.number().integer().strict().required(),
-        stockLevel: joi.number().integer().strict().required(),
-        restockThreshold: joi.number().integer().strict().required(),
-    })
+  const schema = joi.object({
+    name: joi.string().required(),
+    category: joi.string().required(),
+    price: joi.number().integer().strict().required(),
+    stockLevel: joi.number().integer().strict().required(),
+    restockThreshold: joi.number().integer().strict().required(),
+  });
 
-    const { error } = schema.validate(req.body)
+  const { error } = schema.validate(req.body);
 
-    if (error) {
-        return res.status(400).json({
-            status: 'error',
-            message: error.details[0].message,
-            data: null
-        })
-    }
+  if (error) {
+    return res.status(400).json({
+      status: 'error',
+      message: error.details[0].message,
+      data: null,
+    });
+  }
 
-    const { name } = req.body
-    const productSnapshot = await db.collection('products').where("name", "==", name).get()
+  const { name } = req.body;
+  const productSnapshot = await db
+    .collection('products')
+    .where('name', '==', name)
+    .get();
 
-    if (!productSnapshot.empty) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'Product already exists.',
-            data: null
-        })
-    }
+  if (!productSnapshot.empty) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Product already exists.',
+      data: null,
+    });
+  }
 
-    next()
-}
+  next();
+};
 
 const validateUpdateProduct = async (req, res, next) => {
-    const schema = joi.object({
-        name: joi.string(),
-        category: joi.string(),
-        price: joi.number().integer().strict(),
-        stockLevel: joi.number().integer().strict(),
-        restockThreshold: joi.number().integer().strict()
-    })
+  const schema = joi.object({
+    name: joi.string(),
+    category: joi.string(),
+    price: joi.number().integer().strict(),
+    stockLevel: joi.number().integer().strict(),
+    restockThreshold: joi.number().integer().strict(),
+  });
 
-    const { error } = schema.validate(req.body)
+  const { error } = schema.validate(req.body);
 
-    if (error) {
-        return res.status(400).json({
-            status: 'error',
-            message: error.details[0].message,
-            data: null
-        })
+  if (error) {
+    return res.status(400).json({
+      status: 'error',
+      message: error.details[0].message,
+      data: null,
+    });
+  }
+
+  const { name } = req.body;
+
+  if (name) {
+    const productSnapshot = await db
+      .collection('products')
+      .where('name', '==', name)
+      .get();
+
+    if (!productSnapshot.empty) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Product already exists.',
+        data: null,
+      });
     }
+  }
 
-    const { name } = req.body
-
-    if (name) {
-        const productSnapshot = await db.collection('products').where("name", "==", name).get()
-    
-        if (!productSnapshot.empty) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Product already exists.',
-                data: null
-            })
-        }
-    }
-
-    next()
-}
+  next();
+};
 
 const validateCreateProductLog = async (req, res, next) => {
-    const currentStockLevel = req.productSnapshot.data().stockLevel
+  const currentStockLevel = req.productSnapshot.data().stockLevel;
 
-    const schema = joi.object({
-        stockIn: joi.number().integer().strict().min(0).required(),
-        stockOut: joi
-            .number()
-            .integer()
-            .strict()
-            .min(0)
-            .max(currentStockLevel)
-            .required()
-            .messages({
-                'number.max': '"stockOut" must be less than or equal to current product stock level'
-            })
-    }).custom((value, helpers) => {
-        const { stockIn, stockOut } = value
-
-        if (stockIn === 0 && stockOut === 0) {
-            return helpers.message('"stockIn" and "stockOut" cannot both be 0 at the same time')
-        }
-
-        return value
+  const schema = joi
+    .object({
+      stockIn: joi.number().integer().strict().min(0).required(),
+      stockOut: joi
+        .number()
+        .integer()
+        .strict()
+        .min(0)
+        .max(currentStockLevel)
+        .required()
+        .messages({
+          'number.max':
+            '"stockOut" must be less than or equal to current product stock level',
+        }),
     })
+    .custom((value, helpers) => {
+      const { stockIn, stockOut } = value;
 
-    const { error } = schema.validate(req.body)
+      if (stockIn === 0 && stockOut === 0) {
+        return helpers.message(
+          '"stockIn" and "stockOut" cannot both be 0 at the same time'
+        );
+      }
 
-    if (error) {
-        return res.status(400).json({
-            status: 'error',
-            message: error.details[0].message,
-            data: null
-        })
-    }
+      return value;
+    });
 
-    next()
-}
+  const { error } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      status: 'error',
+      message: error.details[0].message,
+      data: null,
+    });
+  }
+
+  next();
+};
 
 module.exports = {
-    validateUserRole,
-    validateProductIdParam,
-    validateCreateProduct,
-    validateUpdateProduct,
-    validateCreateProductLog
-}
+  validateUserRole,
+  validateProductIdParam,
+  validateCreateProduct,
+  validateUpdateProduct,
+  validateCreateProductLog,
+};
