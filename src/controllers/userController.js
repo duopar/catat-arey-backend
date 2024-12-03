@@ -5,7 +5,7 @@ const getUserById = async (req, res) => {
     try {
         const userId = req.userData.userId
         const userData = (await db.collection('users').doc(userId).get()).data()
-        const { username, createdAt, updatedAt } = userData
+        const { username, role, createdAt, updatedAt } = userData
 
         return res.status(200).json({
             status: 'success',
@@ -13,6 +13,7 @@ const getUserById = async (req, res) => {
             data: {
                 userId,
                 username, 
+                role,
                 createdAt, 
                 updatedAt
             }
