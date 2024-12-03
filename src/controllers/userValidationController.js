@@ -6,7 +6,7 @@ const getSecret = require('../config/secretManager');
 
 const register = async (req, res) => {
   try {
-    const { username, password, role } = req.userData;
+    const { username, password, role } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -36,11 +36,11 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { userId, username, userRole } = req.userData;
+  const { userId, username, role } = req.userData;
 
   const JWT_SECRET = await getSecret('JWT_SECRET');
 
-  const token = jwt.sign({ userId, username, userRole }, JWT_SECRET, {
+  const token = jwt.sign({ userId, username, role }, JWT_SECRET, {
     expiresIn: '1h',
   });
 

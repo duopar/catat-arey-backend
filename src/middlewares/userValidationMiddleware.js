@@ -1,34 +1,42 @@
 const bcrypt = require('bcrypt');
 const db = require('../config/firestore');
+const Joi = require('joi');
 
 const validateUserRegistration = async (req, res, next) => {
   try {
-    const { username, password, confirmPassword, role } = req.body;
+    const schema = Joi.object({
+      username: Joi.string().alphanum().min(3).max(30).required(),
+      password: Joi.string()
+        .pattern(
+          new RegExp(
+            '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,30}$'
+          )
+        )
+        .required()
+        .messages({
+          'string.pattern.base':
+            'Password must be between 8-30 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).',
+        }),
+      confirmPassword: Joi.string()
+        .valid(Joi.ref('password'))
+        .required()
+        .messages({
+          'any.only': '"confirmPassword" must match "password"',
+        }),
+      role: Joi.string().valid('owner', 'employee').required(),
+    });
 
-    if (!username || !password || !confirmPassword || !role) {
+    const { error } = schema.validate(req.body);
+
+    if (error) {
       return res.status(400).json({
         status: 'error',
-        message:
-          'Missing required fields: username, password, confirmPassword, or role.',
+        message: error.details[0].message,
         data: null,
       });
     }
 
-    if (password !== confirmPassword) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'password and confirmPassword do not match.',
-        data: null,
-      });
-    }
-
-    if (role !== 'owner' && role !== 'employee') {
-      return res.status(400).json({
-        status: 'error',
-        message: 'role must be "owner" or "employee".',
-        data: null,
-      });
-    }
+    const { username } = req.body;
 
     const userSnapshot = await db
       .collection('users')
@@ -43,12 +51,6 @@ const validateUserRegistration = async (req, res, next) => {
       });
     }
 
-    req.userData = {
-      username,
-      password,
-      role,
-    };
-
     next();
   } catch (error) {
     console.error('Error querying data:', error);
@@ -62,15 +64,22 @@ const validateUserRegistration = async (req, res, next) => {
 
 const validateUserLogin = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const schema = Joi.object({
+      username: Joi.string().required(),
+      password: Joi.string().required(),
+    });
 
-    if (!username || !password) {
+    const { error } = schema.validate(req.body);
+
+    if (error) {
       return res.status(400).json({
         status: 'error',
-        message: 'Missing required fields: username, or password.',
+        message: error.details[0].message,
         data: null,
       });
     }
+
+    const { username, password } = req.body;
 
     const userSnapshot = await db
       .collection('users')
@@ -80,7 +89,7 @@ const validateUserLogin = async (req, res, next) => {
     if (userSnapshot.empty) {
       return res.status(401).json({
         status: 'error',
-        message: 'Invalid credentials: username, or password.',
+        message: 'Invalid "username" or "password".',
         data: null,
       });
     }
@@ -90,18 +99,18 @@ const validateUserLogin = async (req, res, next) => {
     if (!(await bcrypt.compare(password, userPassword))) {
       return res.status(401).json({
         status: 'error',
-        message: 'Invalid credentials: username, or password.',
+        message: 'Invalid "username" or "password".',
         data: null,
       });
     }
 
     const userId = userSnapshot.docs[0].id;
-    const userRole = userSnapshot.docs[0].data().role;
+    const role = userSnapshot.docs[0].data().role;
 
     req.userData = {
       userId,
       username,
-      userRole,
+      role,
     };
 
     next();
