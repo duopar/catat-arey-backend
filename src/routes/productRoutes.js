@@ -2,8 +2,8 @@ const productRouter = require('express').Router();
 
 const {
   validateUserRole,
-  validateCreateProduct,
   validateProductIdParam,
+  validateCreateProduct,
   validateUpdateProduct,
   validateCreateProductLog,
 } = require('../middlewares/productMiddleware');

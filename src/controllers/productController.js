@@ -103,7 +103,7 @@ const createProduct = async (req, res) => {
       updatedAt: Timestamp.now(),
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       status: 'success',
       message: 'Product created successfully.',
       data: {
@@ -208,7 +208,7 @@ const createProductLog = async (req, res) => {
         updatedAt: createdAt,
       });
 
-    return res.status(200).json({
+    return res.status(201).json({
       status: 'success',
       message: 'Product logged successfully.',
       data: {

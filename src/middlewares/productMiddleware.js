@@ -2,13 +2,14 @@ const joi = require('joi');
 const db = require('../config/firestore');
 
 const validateUserRole = (req, res, next) => {
-  const decodedUserRole = req.decodedUserToken.userRole;
+  const decodedUserRole = req.decodedUserToken.role;
+  console.log(decodedUserRole)
 
   if (decodedUserRole !== 'owner') {
     return res.status(401).json({
       status: 'error',
       message:
-        'Access restricted: only users with the "owner" role can add, update, or delete products.',
+        'Only users with the "owner" role are authorized to add, update, or delete products.',
       data: null,
     });
   }
@@ -53,13 +54,14 @@ const validateCreateProduct = async (req, res, next) => {
   }
 
   const { name } = req.body;
+
   const productSnapshot = await db
     .collection('products')
     .where('name', '==', name)
     .get();
 
   if (!productSnapshot.empty) {
-    return res.status(400).json({
+    return res.status(409).json({
       status: 'error',
       message: 'Product already exists.',
       data: null,
@@ -97,7 +99,7 @@ const validateUpdateProduct = async (req, res, next) => {
       .get();
 
     if (!productSnapshot.empty) {
-      return res.status(400).json({
+      return res.status(409).json({
         status: 'error',
         message: 'Product already exists.',
         data: null,
@@ -123,7 +125,7 @@ const validateCreateProductLog = async (req, res, next) => {
         .required()
         .messages({
           'number.max':
-            '"stockOut" must be less than or equal to current product stock level',
+            '"stockOut" must be less than or equal to the current product\'s "stockLevel".',
         }),
     })
     .custom((value, helpers) => {
@@ -131,7 +133,7 @@ const validateCreateProductLog = async (req, res, next) => {
 
       if (stockIn === 0 && stockOut === 0) {
         return helpers.message(
-          '"stockIn" and "stockOut" cannot both be 0 at the same time'
+          '"stockIn" and "stockOut" cannot both be 0 at the same time.'
         );
       }
 

@@ -31,9 +31,9 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const userId = req.params.userId
-    const { newPassword } = req.body
-    
+    const userId = req.params.userId;
+    const { newPassword } = req.body;
+
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
     await db.collection('users').doc(userId).update({
