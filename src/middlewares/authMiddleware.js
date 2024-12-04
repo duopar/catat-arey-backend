@@ -37,30 +37,27 @@ const validateUserToken = async (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({
       status: 'error',
-      message: 'Authorization header missing.',
+      message: 'Token is missing in the "authorization" header.',
       data: null,
     });
   }
 
-  const [bearer, userToken] = authHeader.split(' ');
+  const authHeaderParts = authHeader.split(' ');
 
-  if (bearer !== 'Bearer') {
+  if (
+    authHeaderParts.length !== 2 ||
+    authHeaderParts[0] !== 'Bearer' ||
+    !authHeaderParts[1]
+  ) {
     return res.status(401).json({
       status: 'error',
-      message: 'Invalid token format. Use "Bearer <your-token>"',
-      data: null,
-    });
-  }
-
-  if (!userToken) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'No token provided. Authorization required.',
+      message: 'Invalid token format. Expected "Bearer <your-token>".',
       data: null,
     });
   }
 
   try {
+    const userToken = authHeaderParts[1];
     const decodedUserToken = jwt.verify(userToken, JWT_SECRET);
 
     req.decodedUserToken = decodedUserToken;
