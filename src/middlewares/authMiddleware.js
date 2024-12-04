@@ -15,7 +15,7 @@ const validateUserApiKey = async (req, res, next) => {
   if (!userApiKey) {
     return res.status(401).json({
       status: 'error',
-      message: 'No API key provided. Authorization required.',
+      message: 'API key is missing in the "x-api-key" header.',
       data: null,
     });
   }
