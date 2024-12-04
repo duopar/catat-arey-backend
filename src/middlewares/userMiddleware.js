@@ -13,10 +13,6 @@ const validateUserIdParam = async (req, res, next) => {
     });
   }
 
-  req.userData = {
-    userId,
-  };
-
   next();
 };
 
