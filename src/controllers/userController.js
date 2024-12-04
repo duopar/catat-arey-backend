@@ -22,8 +22,7 @@ const getUserById = async (req, res) => {
     console.error('Error querying data:', error);
     return res.status(500).json({
       status: 'error',
-      message:
-        'Failed to retrieve user data due to server error.',
+      message: 'Failed to retrieve user data due to server error.',
       data: null,
     });
   }

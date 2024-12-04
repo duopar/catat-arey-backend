@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const db = require('../config/firestore');
 
@@ -17,21 +18,33 @@ const validateUserIdParam = async (req, res, next) => {
 };
 
 const validateUserUpdate = async (req, res, next) => {
-  const { currentPassword, newPassword, confirmPassword } = req.body;
+  const schema = Joi.object({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string()
+      .pattern(
+        new RegExp(
+          '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,30}$'
+        )
+      )
+      .required()
+      .messages({
+        'string.pattern.base':
+          '"newPassword" must be between 8-30 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).',
+      }),
+    confirmPassword: Joi.string()
+      .valid(Joi.ref('newPassword'))
+      .required()
+      .messages({
+        'any.only': '"confirmPassword" must match "newPassword"',
+      }),
+  });
 
-  if (!currentPassword || !newPassword || !confirmPassword) {
+  const { error } = schema.validate(req.body);
+
+  if (error) {
     return res.status(400).json({
       status: 'error',
-      message:
-        'Missing required fields: currentPassword, newPassword, or confirmPassword.',
-      data: null,
-    });
-  }
-
-  if (newPassword !== confirmPassword) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'newPassword and confirmPassword do not match.',
+      message: error.details[0].message,
       data: null,
     });
   }
@@ -48,20 +61,22 @@ const validateUserUpdate = async (req, res, next) => {
   }
 
   try {
+    const { currentPassword, newPassword } = req.body;
+
     const userData = (await db.collection('users').doc(userId).get()).data();
     const userPassword = userData.password;
 
     if (!(await bcrypt.compare(currentPassword, userPassword))) {
       return res.status(401).json({
         status: 'error',
-        message: 'Invalid credentials: currentPassword.',
+        message: 'Invalid "currentPassword".',
         data: null,
       });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-    req.userData.hashedNewPassword = hashedNewPassword;
+    req.hashedNewPassword = hashedNewPassword;
 
     next();
   } catch (error) {
