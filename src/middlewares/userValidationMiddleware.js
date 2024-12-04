@@ -118,7 +118,7 @@ const validateUserLogin = async (req, res, next) => {
     console.error('Error querying data:', error);
     return res.status(500).json({
       status: 'error',
-      message: 'Login failed due to server error: error querying data.',
+      message: 'Login failed due to server error.',
       data: null,
     });
   }
