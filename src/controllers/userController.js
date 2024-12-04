@@ -3,7 +3,7 @@ const db = require('../config/firestore');
 
 const getUserById = async (req, res) => {
   try {
-    const userId = req.userData.userId;
+    const userId = req.params.userId;
     const userData = (await db.collection('users').doc(userId).get()).data();
     const { username, role, createdAt, updatedAt } = userData;
 
@@ -23,7 +23,7 @@ const getUserById = async (req, res) => {
     return res.status(500).json({
       status: 'error',
       message:
-        'Failed to retrieve user data due to server error: error querying data.',
+        'Failed to retrieve user data due to server error.',
       data: null,
     });
   }
