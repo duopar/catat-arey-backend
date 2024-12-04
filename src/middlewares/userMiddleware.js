@@ -53,7 +53,7 @@ const validateUserUpdate = async (req, res, next) => {
   const decodedUserId = req.decodedUserToken.userId;
 
   if (userId !== decodedUserId) {
-    return res.status(400).json({
+    return res.status(401).json({
       status: 'error',
       message: 'Cannot change password for another user.',
       data: null,
@@ -61,7 +61,7 @@ const validateUserUpdate = async (req, res, next) => {
   }
 
   try {
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword } = req.body;
 
     const userData = (await db.collection('users').doc(userId).get()).data();
     const userPassword = userData.password;
@@ -73,10 +73,6 @@ const validateUserUpdate = async (req, res, next) => {
         data: null,
       });
     }
-
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
-    req.hashedNewPassword = hashedNewPassword;
 
     next();
   } catch (error) {
