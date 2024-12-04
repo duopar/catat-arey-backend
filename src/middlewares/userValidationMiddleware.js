@@ -15,7 +15,7 @@ const validateUserRegistration = async (req, res, next) => {
         .required()
         .messages({
           'string.pattern.base':
-            'Password must be between 8-30 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).',
+            '"password" must be between 8-30 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).',
         }),
       confirmPassword: Joi.string()
         .valid(Joi.ref('password'))
@@ -44,7 +44,7 @@ const validateUserRegistration = async (req, res, next) => {
       .get();
 
     if (!userSnapshot.empty) {
-      return res.status(400).json({
+      return res.status(409).json({
         status: 'error',
         message: 'Username already exists.',
         data: null,
@@ -56,7 +56,7 @@ const validateUserRegistration = async (req, res, next) => {
     console.error('Error querying data:', error);
     return res.status(500).json({
       status: 'error',
-      message: 'Registration failed due to server error: error querying data.',
+      message: 'Registration failed due to server error.',
       data: null,
     });
   }
