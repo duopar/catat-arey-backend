@@ -41,7 +41,7 @@ const updateUser = async (req, res) => {
       updatedAt: Timestamp.now(),
     });
 
-    return res.status(204).json({
+    return res.status(200).json({
       status: 'success',
       message: 'Password updated successfully.',
       data: null,
