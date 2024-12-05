@@ -3,7 +3,6 @@ const db = require('../config/firestore');
 
 const validateUserRole = (req, res, next) => {
   const decodedUserRole = req.decodedUserToken.role;
-  console.log(decodedUserRole)
 
   if (decodedUserRole !== 'owner') {
     return res.status(401).json({
