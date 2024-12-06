@@ -35,7 +35,7 @@ describe('Validate user registration middleware', () => {
     mockNext = createMockNext();
   });
 
-  it('Reject registration if any property is empty and return 400.', async () => {
+  it('Reject registration when any property is empty and return 400.', async () => {
     const mockRequest = createMockRequest({
       username: '',
       password: 'Tes@1234',
@@ -54,7 +54,7 @@ describe('Validate user registration middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject registration if username already exists and return 409.', async () => {
+  it('Reject registration when username already exists and return 409.', async () => {
     db.get.mockResolvedValueOnce({
       empty: false,
     });
@@ -70,7 +70,7 @@ describe('Validate user registration middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject registration if server error and return 500.', async () => {
+  it('Reject registration when server encounters an error and return 500.', async () => {
     db.get.mockRejectedValueOnce(new Error('Database query failed.'));
 
     await validateUserRegistration(mockRequest, mockResponse, mockNext);
@@ -84,7 +84,7 @@ describe('Validate user registration middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow registration if all conditions are met and return 200.', async () => {
+  it('Allow registration when all properties are valid and return 200.', async () => {
     db.get.mockResolvedValueOnce({
       empty: true,
     });
@@ -111,7 +111,7 @@ describe('Validate user login middleware', () => {
     mockNext = createMockNext();
   });
 
-  it('Reject login if any property is empty and return 400.', async () => {
+  it('Reject login when any property is empty and return 400.', async () => {
     const mockRequest = createMockRequest({
       username: '',
       password: 'Tes@1234',
@@ -128,7 +128,7 @@ describe('Validate user login middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject login if username does not exist and return 401.', async () => {
+  it('Reject login when username is not found and return 401.', async () => {
     db.get.mockResolvedValueOnce({
       empty: true,
     });
@@ -144,7 +144,7 @@ describe('Validate user login middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject login for invalid password and return 401.', async () => {
+  it('Reject login when password is invalid and return 401.', async () => {
     db.get.mockResolvedValueOnce({
       empty: false,
       docs: [
@@ -169,7 +169,7 @@ describe('Validate user login middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject login if server error and return 500.', async () => {
+  it('Reject login when server encounters an error and return 500.', async () => {
     db.get.mockRejectedValueOnce(new Error('Database query failed.'));
 
     await validateUserLogin(mockRequest, mockResponse, mockNext);
@@ -183,7 +183,7 @@ describe('Validate user login middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow login if all conditions are met and return 200.', async () => {
+  it('Allow login when all properties are valid and return 200.', async () => {
     db.get.mockResolvedValueOnce({
       empty: false,
       docs: [

@@ -53,10 +53,9 @@ const validateUserRegistration = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Error querying data:', error);
     return res.status(500).json({
       status: 'error',
-      message: 'Registration failed due to server error.',
+      message: `Registration failed due to server error. \n${error}`,
       data: null,
     });
   }
@@ -115,10 +114,9 @@ const validateUserLogin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Error querying data:', error);
     return res.status(500).json({
       status: 'error',
-      message: 'Login failed due to server error.',
+      message: `Login failed due to server error. \n${error}`,
       data: null,
     });
   }
