@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "start": "NODE_ENV=production node src/server.js",
     "dev": "NODE_ENV=development nodemon src/server.js",
     "lint": "eslint .",
