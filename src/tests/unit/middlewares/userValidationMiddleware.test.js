@@ -14,27 +14,40 @@ const bcrypt = require('bcrypt');
 const db = require('../../../config/firestore');
 
 const {
+  createMockRequest,
+  createMockResponse,
+  createMockNext,
+} = require('../utils/helper');
+
+const {
   validateUserRegistration,
   validateUserLogin,
 } = require('../../../middlewares/userValidationMiddleware');
 
-describe('Validate user registration', () => {
-  it('Reject registration if any property is empty.', async () => {
-    const mockRequest = {
-      body: {
-        username: '',
-        password: 'Tes@1234',
-        confirmPassword: 'Tes@1234',
-        role: 'owner',
-      },
-    };
+describe('Validate user registration middleware', () => {
+  let mockRequest;
+  let mockResponse;
+  let mockNext;
 
-    const mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
+  beforeEach(() => {
+    console.log('bjir');
+    mockRequest = createMockRequest({
+      username: 'testUser',
+      password: 'Tes@1234',
+      confirmPassword: 'Tes@1234',
+      role: 'owner',
+    });
+    mockResponse = createMockResponse();
+    mockNext = createMockNext();
+  });
 
-    const mockNext = jest.fn();
+  it('Reject registration if any property is empty and return 400.', async () => {
+    mockRequest = createMockRequest({
+      username: '',
+      password: 'Tes@1234',
+      confirmPassword: 'Tes@1234',
+      role: 'owner',
+    });
 
     await validateUserRegistration(mockRequest, mockResponse, mockNext);
 
@@ -47,26 +60,9 @@ describe('Validate user registration', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject registration if username already exists.', async () => {
-    const mockRequest = {
-      body: {
-        username: 'testUser',
-        password: 'Tes@1234',
-        confirmPassword: 'Tes@1234',
-        role: 'owner',
-      },
-    };
-
-    const mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const mockNext = jest.fn();
-
+  it('Reject registration if username already exists and return 409.', async () => {
     db.get.mockResolvedValueOnce({
       empty: false,
-      docs: [],
     });
 
     await validateUserRegistration(mockRequest, mockResponse, mockNext);
@@ -80,23 +76,7 @@ describe('Validate user registration', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject registration if server error.', async () => {
-    const mockRequest = {
-      body: {
-        username: 'testUser',
-        password: 'Tes@1234',
-        confirmPassword: 'Tes@1234',
-        role: 'owner',
-      },
-    };
-
-    const mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const mockNext = jest.fn();
-
+  it('Reject registration if server error and return 500.', async () => {
     db.get.mockRejectedValueOnce(new Error('Database query failed.'));
 
     await validateUserRegistration(mockRequest, mockResponse, mockNext);
@@ -110,37 +90,15 @@ describe('Validate user registration', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow registration if all conditions are met.', async () => {
-    const mockRequest = {
-      body: {
-        username: 'testUser',
-        password: 'Tes@1234',
-        confirmPassword: 'Tes@1234',
-        role: 'owner',
-      },
-    };
-
-    const mockResponse = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-
-    const mockNext = jest.fn();
-
+  it('Allow registration if all conditions are met and return 200.', async () => {
     db.get.mockResolvedValueOnce({
       empty: true,
-      docs: [],
     });
 
     await validateUserRegistration(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).not.toHaveBeenCalled();
+    expect(mockResponse.json).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalled();
   });
-});
-
-describe('', () => {
-  it('', () => {});
-
-  it('', () => {});
 });
