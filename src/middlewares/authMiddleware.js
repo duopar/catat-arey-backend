@@ -64,8 +64,6 @@ const validateUserToken = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error.name);
-
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         status: 'error',

@@ -86,6 +86,6 @@ const validateUserUpdate = async (req, res, next) => {
 };
 
 module.exports = {
-  validateUserUpdate,
   validateUserIdParam,
+  validateUserUpdate,
 };
