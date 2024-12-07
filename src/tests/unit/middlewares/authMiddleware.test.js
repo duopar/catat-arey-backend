@@ -12,18 +12,18 @@ jest.mock('../../../config/secretManager', () => jest.fn());
 const jwt = require('jsonwebtoken');
 const getSecret = require('../../../config/secretManager');
 
+let mockResponse;
+let mockNext;
+
+beforeEach(async () => {
+  mockResponse = createMockResponse();
+  mockNext = createMockNext();
+});
+
 describe('Validate API Key middleware', () => {
-  let mockResponse;
-  let mockNext;
-
-  beforeEach(async () => {
-    jest.clearAllMocks();
-
+  beforeAll(async () => {
     getSecret.mockResolvedValue('valid-api-key');
     await initializeSecrets();
-
-    mockResponse = createMockResponse();
-    mockNext = createMockNext();
   });
 
   it('Reject request when API Key is missing and return 401.', async () => {
@@ -78,17 +78,9 @@ describe('Validate API Key middleware', () => {
 });
 
 describe('Validate token middleware', () => {
-  let mockResponse;
-  let mockNext;
-
-  beforeEach(async () => {
-    jest.clearAllMocks();
-
+  beforeAll(async () => {
     getSecret.mockResolvedValue('Bearer valid-token');
     await initializeSecrets();
-
-    mockResponse = createMockResponse();
-    mockNext = createMockNext();
   });
 
   it('Reject request when token is missing and return 401.', async () => {
@@ -154,7 +146,7 @@ describe('Validate token middleware', () => {
     };
 
     jwt.verify.mockImplementationOnce(() => {
-      const error = new Error('jwt expired');
+      const error = new Error('jwt has expired');
       error.name = 'TokenExpiredError';
       throw error;
     });
@@ -178,7 +170,7 @@ describe('Validate token middleware', () => {
     };
 
     jwt.verify.mockImplementationOnce(() => {
-      const error = new Error('jwt invalid');
+      const error = new Error('jwt is invalid');
       error.name = 'JsonWebTokenError';
       throw error;
     });

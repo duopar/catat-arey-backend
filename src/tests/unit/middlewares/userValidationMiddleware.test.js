@@ -19,20 +19,24 @@ jest.mock('../../../config/firestore', () => ({
 const bcrypt = require('bcrypt');
 const db = require('../../../config/firestore');
 
+let mockResponse;
+let mockNext;
+
+beforeEach(() => {
+  mockResponse = createMockResponse();
+  mockNext = createMockNext();
+});
+
 describe('Validate user registration middleware', () => {
   let mockRequest;
-  let mockResponse;
-  let mockNext;
 
-  beforeEach(() => {
+  beforeAll(() => {
     mockRequest = createMockRequest({
       username: 'testUser',
       password: 'Tes@1234',
       confirmPassword: 'Tes@1234',
       role: 'owner',
     });
-    mockResponse = createMockResponse();
-    mockNext = createMockNext();
   });
 
   it('Reject registration when any property is empty and return 400.', async () => {
@@ -99,16 +103,12 @@ describe('Validate user registration middleware', () => {
 
 describe('Validate user login middleware', () => {
   let mockRequest;
-  let mockResponse;
-  let mockNext;
 
-  beforeEach(() => {
+  beforeAll(() => {
     mockRequest = createMockRequest({
       username: 'testUser',
       password: 'Tes@1234',
     });
-    mockResponse = createMockResponse();
-    mockNext = createMockNext();
   });
 
   it('Reject login when any property is empty and return 400.', async () => {
