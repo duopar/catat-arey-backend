@@ -84,7 +84,7 @@ describe('Validate user registration middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow registration when all properties are valid and return 200.', async () => {
+  it('Allow registration when all properties are valid.', async () => {
     db.get.mockResolvedValueOnce({
       empty: true,
     });
@@ -183,7 +183,7 @@ describe('Validate user login middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow login when all properties are valid and return 200.', async () => {
+  it('Allow login when all properties are valid.', async () => {
     db.get.mockResolvedValueOnce({
       empty: false,
       docs: [

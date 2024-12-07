@@ -32,31 +32,31 @@ const validateUserApiKey = async (req, res, next) => {
 };
 
 const validateUserToken = async (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-
-  if (!authHeader) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'Token is missing in the "authorization" header.',
-      data: null,
-    });
-  }
-
-  const authHeaderParts = authHeader.split(' ');
-
-  if (
-    authHeaderParts.length !== 2 ||
-    authHeaderParts[0] !== 'Bearer' ||
-    !authHeaderParts[1]
-  ) {
-    return res.status(401).json({
-      status: 'error',
-      message: 'Invalid token format. Expected "Bearer <your-token>".',
-      data: null,
-    });
-  }
-
   try {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Token is missing in the "authorization" header.',
+        data: null,
+      });
+    }
+
+    const authHeaderParts = authHeader.split(' ');
+
+    if (
+      authHeaderParts.length !== 2 ||
+      authHeaderParts[0] !== 'Bearer' ||
+      !authHeaderParts[1]
+    ) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Invalid token format. Expected "Bearer <your-token>".',
+        data: null,
+      });
+    }
+
     const userToken = authHeaderParts[1];
     const decodedUserToken = jwt.verify(userToken, JWT_SECRET);
 
@@ -64,6 +64,8 @@ const validateUserToken = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error.name);
+
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         status: 'error',
@@ -74,7 +76,7 @@ const validateUserToken = async (req, res, next) => {
 
     return res.status(401).json({
       status: 'error',
-      message: 'Invalid token.',
+      message: 'Token is invalid.',
       data: null,
     });
   }
