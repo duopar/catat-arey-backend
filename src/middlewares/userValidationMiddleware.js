@@ -55,7 +55,7 @@ const validateUserRegistration = async (req, res, next) => {
   } catch (error) {
     return res.status(500).json({
       status: 'error',
-      message: `Registration failed due to server error. \n${error}`,
+      message: `Registration failed due to server error. ${error}`,
       data: null,
     });
   }
@@ -116,7 +116,7 @@ const validateUserLogin = async (req, res, next) => {
   } catch (error) {
     return res.status(500).json({
       status: 'error',
-      message: `Login failed due to server error. \n${error}`,
+      message: `Login failed due to server error. ${error}`,
       data: null,
     });
   }

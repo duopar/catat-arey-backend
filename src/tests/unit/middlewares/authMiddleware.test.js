@@ -102,7 +102,7 @@ describe('Validate token middleware', () => {
   });
 
   it('Reject request when token format is invalid and return 401.', async () => {
-    const mockRequest = [
+    const mockRequests = [
       {
         headers: {
           authorization: 'invalid-token',
@@ -125,8 +125,10 @@ describe('Validate token middleware', () => {
       },
     ];
 
-    for (const request of mockRequest) {
-      await validateUserToken(request, mockResponse, mockNext);
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
+
+      await validateUserToken(mockRequest, mockResponse, mockNext);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
