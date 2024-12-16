@@ -87,7 +87,8 @@ const validateCreateOrUpdateProduct = async (req, res, next) => {
   next();
 };
 
-const validateCreateProductLog = async (req, res, next) => {
+const validateCreateProductLog = (req, res, next) => {
+  // product snapshot from validateProductIdParam middleware
   const currentStockLevel = req.productSnapshot.data().stockLevel;
 
   const schema = joi

@@ -171,7 +171,6 @@ const deleteProduct = async (req, res) => {
 };
 
 // log products
-
 const createProductLog = async (req, res) => {
   try {
     const productId = req.params.productId;

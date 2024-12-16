@@ -37,9 +37,7 @@ productRouter.delete(
   validateProductIdParam,
   deleteProduct
 );
-
 // log products
-
 productRouter.post(
   '/:productId/logs',
   validateProductIdParam,

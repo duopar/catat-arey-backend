@@ -176,55 +176,203 @@ describe('Validate create or update product middleware', () => {
     }
   });
 
-  it('Reject request when product already exists and return 409.', async () => {
-    const mockRequest = {
-      params: {},
-      body: {
-        name: 'existing-product',
-        category: 'grocery',
-        price: 5000,
-        stockLevel: 10,
-        restockThreshold: 2,
+  it('Reject request when product name already exists and return 409.', async () => {
+    const mockRequests = [
+      // request for creating product
+      {
+        params: {},
+        body: {
+          name: 'existing-product',
+          category: 'grocery',
+          price: 5000,
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
       },
-    };
+      // request for updating product
+      {
+        params: {
+          productId: 'my-productId',
+        },
+        body: {
+          name: 'existing-product',
+          category: 'grocery',
+          price: 5000,
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
+      },
+    ];
 
-    db.get.mockResolvedValueOnce({
-      empty: false,
-    });
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
 
-    await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+      db.get.mockResolvedValueOnce({
+        empty: false,
+      });
 
-    expect(mockResponse.status).toHaveBeenCalledWith(409);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'error',
-      message: 'Product already exists.',
-      data: null,
-    });
-    expect(mockNext).not.toHaveBeenCalled;
+      await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(409);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: 'Product already exists.',
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled;
+    }
   });
 
   it('Allow request when all conditions are met', async () => {
+    const mockRequests = [
+      // request for creating product
+      {
+        params: {},
+        body: {
+          name: 'sugar',
+          category: 'grocery',
+          price: 5000,
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
+      },
+      // request for updating product
+      {
+        params: {
+          productId: 'my-productId',
+        },
+        body: {
+          category: 'grocery',
+        },
+      },
+    ];
+
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
+
+      db.get.mockResolvedValueOnce({
+        empty: true,
+      });
+
+      await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+
+      expect(mockResponse.status).not.toHaveBeenCalled();
+      expect(mockResponse.json).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+    }
+  });
+});
+
+describe('Validate create product log middleware', () => {
+  it('Reject request when any property is empty and return 400.', () => {
+    const mockRequests = [
+      {
+        productSnapshot: {
+          data: () => ({
+            stockLevel: 5,
+          }),
+        },
+        body: {
+          stockOut: 2,
+        },
+      },
+      {
+        productSnapshot: {
+          data: () => ({
+            stockLevel: 5,
+          }),
+        },
+        body: {
+          stockIn: 2,
+        },
+      },
+    ];
+
+    const validProperties = ['stockIn', 'stockOut'];
+
+    let validPropertiesIndex = 0;
+
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
+
+      validateCreateProductLog(mockRequest, mockResponse, mockNext);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: `"${validProperties[validPropertiesIndex++]}" is required`,
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    }
+  });
+
+  it('Reject request when stockOut exceeds current stockLevel and return 400.', () => {
     const mockRequest = {
-      params: {},
+      productSnapshot: {
+        data: () => ({
+          stockLevel: 5,
+        }),
+      },
       body: {
-        name: 'sugar',
-        category: 'grocery',
-        price: 5000,
-        stockLevel: 10,
-        restockThreshold: 2,
+        stockIn: 0,
+        stockOut: 10,
       },
     };
 
-    db.get.mockResolvedValueOnce({
-      empty: true,
-    });
+    validateCreateProductLog(mockRequest, mockResponse, mockNext);
 
-    await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message:
+        '"stockOut" must be less than or equal to the current product\'s "stockLevel".',
+      data: null,
+    });
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('Reject request when both stockIn and stockOut are 0 and return 400.', () => {
+    const mockRequest = {
+      productSnapshot: {
+        data: () => ({
+          stockLevel: 5,
+        }),
+      },
+      body: {
+        stockIn: 0,
+        stockOut: 0,
+      },
+    };
+
+    validateCreateProductLog(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: '"stockIn" and "stockOut" cannot both be 0 at the same time.',
+      data: null,
+    });
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('Allow request when all conditions are met', () => {
+    const mockRequest = {
+      productSnapshot: {
+        data: () => ({
+          stockLevel: 5,
+        }),
+      },
+      body: {
+        stockIn: 0,
+        stockOut: 2,
+      },
+    };
+
+    validateCreateProductLog(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).not.toHaveBeenCalled();
     expect(mockResponse.json).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalled();
   });
 });
-
-describe('', () => {});
