@@ -1,8 +1,7 @@
 const {
   validateUserRole,
   validateProductIdParam,
-  validateCreateProduct,
-  validateUpdateProduct,
+  validateCreateOrUpdateProduct,
   validateCreateProductLog,
 } = require('../../../middlewares/productMiddleware');
 
@@ -101,3 +100,131 @@ describe('Validate product id parameter middleware', () => {
     expect(mockNext).toHaveBeenCalled();
   });
 });
+
+describe('Validate create or update product middleware', () => {
+  it('Reject request when any property is empty and return 400.', async () => {
+    const mockRequests = [
+      {
+        params: {},
+        body: {
+          category: 'grocery',
+          price: 5000,
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
+      },
+      {
+        params: {},
+        body: {
+          name: 'sugar',
+          price: 5000,
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
+      },
+      {
+        params: {},
+        body: {
+          name: 'sugar',
+          category: 'grocery',
+          stockLevel: 10,
+          restockThreshold: 2,
+        },
+      },
+      {
+        params: {},
+        body: {
+          name: 'sugar',
+          category: 'grocery',
+          price: 5000,
+          restockThreshold: 2,
+        },
+      },
+      {
+        params: {},
+        body: {
+          name: 'sugar',
+          category: 'grocery',
+          price: 5000,
+          stockLevel: 10,
+        },
+      },
+    ];
+
+    const validProperties = [
+      'name',
+      'category',
+      'price',
+      'stockLevel',
+      'restockThreshold',
+    ];
+
+    let validPropertiesIndex = 0;
+
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
+
+      await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: `"${validProperties[validPropertiesIndex++]}" is required`,
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    }
+  });
+
+  it('Reject request when product already exists and return 409.', async () => {
+    const mockRequest = {
+      params: {},
+      body: {
+        name: 'existing-product',
+        category: 'grocery',
+        price: 5000,
+        stockLevel: 10,
+        restockThreshold: 2,
+      },
+    };
+
+    db.get.mockResolvedValueOnce({
+      empty: false,
+    });
+
+    await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(409);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: 'Product already exists.',
+      data: null,
+    });
+    expect(mockNext).not.toHaveBeenCalled;
+  });
+
+  it('Allow request when all conditions are met', async () => {
+    const mockRequest = {
+      params: {},
+      body: {
+        name: 'sugar',
+        category: 'grocery',
+        price: 5000,
+        stockLevel: 10,
+        restockThreshold: 2,
+      },
+    };
+
+    db.get.mockResolvedValueOnce({
+      empty: true,
+    });
+
+    await validateCreateOrUpdateProduct(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.status).not.toHaveBeenCalled();
+    expect(mockResponse.json).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
+  });
+});
+
+describe('', () => {});

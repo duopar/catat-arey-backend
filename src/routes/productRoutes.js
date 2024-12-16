@@ -3,8 +3,7 @@ const productRouter = require('express').Router();
 const {
   validateUserRole,
   validateProductIdParam,
-  validateCreateProduct,
-  validateUpdateProduct,
+  validateCreateOrUpdateProduct,
   validateCreateProductLog,
 } = require('../middlewares/productMiddleware');
 
@@ -19,12 +18,17 @@ const {
 
 productRouter.get('/', getAllProducts);
 productRouter.get('/:productId', validateProductIdParam, getProductById);
-productRouter.post('/', validateUserRole, validateCreateProduct, createProduct);
+productRouter.post(
+  '/',
+  validateUserRole,
+  validateCreateOrUpdateProduct,
+  createProduct
+);
 productRouter.put(
   '/:productId',
   validateUserRole,
   validateProductIdParam,
-  validateUpdateProduct,
+  validateCreateOrUpdateProduct,
   updateProduct
 );
 productRouter.delete(

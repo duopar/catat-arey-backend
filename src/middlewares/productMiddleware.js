@@ -2,6 +2,7 @@ const joi = require('joi');
 const db = require('../config/firestore');
 
 const validateUserRole = (req, res, next) => {
+  // decoded jwt token from validateUserToken middleware
   const decodedUserRole = req.decodedUserToken.role;
 
   if (decodedUserRole !== 'owner') {
@@ -33,51 +34,28 @@ const validateProductIdParam = async (req, res, next) => {
   next();
 };
 
-const validateCreateProduct = async (req, res, next) => {
-  const schema = joi.object({
-    name: joi.string().required(),
-    category: joi.string().required(),
-    price: joi.number().integer().strict().required(),
-    stockLevel: joi.number().integer().strict().required(),
-    restockThreshold: joi.number().integer().strict().required(),
-  });
+const validateCreateOrUpdateProduct = async (req, res, next) => {
+  let schema;
 
-  const { error } = schema.validate(req.body);
-
-  if (error) {
-    return res.status(400).json({
-      status: 'error',
-      message: error.details[0].message,
-      data: null,
+  if (!req.params.productId) {
+    // create product
+    schema = joi.object({
+      name: joi.string().required(),
+      category: joi.string().required(),
+      price: joi.number().integer().strict().required(),
+      stockLevel: joi.number().integer().strict().required(),
+      restockThreshold: joi.number().integer().strict().required(),
+    });
+  } else {
+    // update product
+    schema = joi.object({
+      name: joi.string(),
+      category: joi.string(),
+      price: joi.number().integer().strict(),
+      stockLevel: joi.number().integer().strict(),
+      restockThreshold: joi.number().integer().strict(),
     });
   }
-
-  const { name } = req.body;
-
-  const productSnapshot = await db
-    .collection('products')
-    .where('name', '==', name)
-    .get();
-
-  if (!productSnapshot.empty) {
-    return res.status(409).json({
-      status: 'error',
-      message: 'Product already exists.',
-      data: null,
-    });
-  }
-
-  next();
-};
-
-const validateUpdateProduct = async (req, res, next) => {
-  const schema = joi.object({
-    name: joi.string(),
-    category: joi.string(),
-    price: joi.number().integer().strict(),
-    stockLevel: joi.number().integer().strict(),
-    restockThreshold: joi.number().integer().strict(),
-  });
 
   const { error } = schema.validate(req.body);
 
@@ -155,7 +133,6 @@ const validateCreateProductLog = async (req, res, next) => {
 module.exports = {
   validateUserRole,
   validateProductIdParam,
-  validateCreateProduct,
-  validateUpdateProduct,
+  validateCreateOrUpdateProduct,
   validateCreateProductLog,
 };
