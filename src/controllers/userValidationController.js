@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Timestamp } = require('@google-cloud/firestore');
 const db = require('../config/firestore');
-const getSecret = require('../config/secretManager');
+const { getJwtSecret } = require('../middlewares/authMiddleware');
 
 const register = async (req, res) => {
   try {
@@ -38,7 +38,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { userId, username, role } = req.userData;
 
-  const JWT_SECRET = await getSecret('JWT_SECRET');
+  const JWT_SECRET = getJwtSecret();
 
   const token = jwt.sign({ userId, username, role }, JWT_SECRET, {
     expiresIn: '1h',

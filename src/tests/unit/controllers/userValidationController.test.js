@@ -5,15 +5,13 @@ const {
 
 const { createMockResponse } = require('../utils/jestMocks');
 
-jest.mock('bcrypt');
-jest.mock('@google-cloud/firestore');
+jest.mock('jsonwebtoken');
 jest.mock('../../../config/firestore', () => ({
   collection: jest.fn().mockReturnThis(),
   add: jest.fn(),
 }));
 
-const bcrypt = require('bcrypt');
-const { Timestamp } = require('@google-cloud/firestore');
+const jwt = require('jsonwebtoken');
 const db = require('../../../config/firestore');
 
 let mockResponse;
@@ -48,7 +46,7 @@ describe('Validate register controller', () => {
     });
   });
 
-  it('Successfully register user with valid input and return 201.', async () => {
+  it('Successfully register user with valid data and return 201.', async () => {
     db.add.mockResolvedValueOnce({
       id: 'my-userId',
     });

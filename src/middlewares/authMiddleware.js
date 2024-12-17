@@ -9,6 +9,14 @@ const initializeSecrets = async () => {
   JWT_SECRET = await getSecret('JWT_SECRET');
 };
 
+const getApiKey = () => {
+  return API_KEY;
+};
+
+const getJwtSecret = () => {
+  return JWT_SECRET;
+};
+
 const validateUserApiKey = async (req, res, next) => {
   const userApiKey = req.headers['x-api-key'];
 
@@ -84,4 +92,6 @@ module.exports = {
   initializeSecrets,
   validateUserApiKey,
   validateUserToken,
+  getApiKey,
+  getJwtSecret,
 };
