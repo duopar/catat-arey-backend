@@ -63,3 +63,30 @@ describe('Validate register controller', () => {
     });
   });
 });
+
+describe('Validate login controller', () => {
+  it('Successfully log in user with valid data and return 200.', async () => {
+    const mockRequest = {
+      userData: {
+        userId: 'my-userId',
+        username: 'testUser',
+        role: 'owner',
+      },
+    };
+
+    jwt.sign.mockReturnValue('my-token');
+
+    await login(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'success',
+      message: 'Login successful.',
+      data: {
+        userId: 'my-userId',
+        username: 'testUser',
+        token: 'my-token',
+      },
+    });
+  });
+});
