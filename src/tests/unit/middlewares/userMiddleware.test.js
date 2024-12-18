@@ -53,6 +53,7 @@ describe('Validate user id parameter middleware', () => {
   it('Allow request when userId exists.', async () => {
     db.get.mockResolvedValueOnce({
       exists: true,
+      data: jest.fn(),
     });
 
     await validateUserIdParam(mockRequest, mockResponse, mockNext);

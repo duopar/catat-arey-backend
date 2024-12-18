@@ -14,6 +14,8 @@ const validateUserIdParam = async (req, res, next) => {
     });
   }
 
+  req.userData = userDoc.data();
+
   next();
 };
 

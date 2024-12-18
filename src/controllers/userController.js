@@ -3,30 +3,20 @@ const { Timestamp } = require('@google-cloud/firestore');
 const db = require('../config/firestore');
 
 const getUserById = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const userData = (await db.collection('users').doc(userId).get()).data();
-    const { username, role, createdAt, updatedAt } = userData;
+  const userId = req.params.userId;
+  const { username, role, createdAt, updatedAt } = req.userData;
 
-    return res.status(200).json({
-      status: 'success',
-      message: 'User data retrieved successfully.',
-      data: {
-        userId,
-        username,
-        role,
-        createdAt,
-        updatedAt,
-      },
-    });
-  } catch (error) {
-    console.error('Error querying data:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to retrieve user data due to server error.',
-      data: null,
-    });
-  }
+  return res.status(200).json({
+    status: 'success',
+    message: 'User data retrieved successfully.',
+    data: {
+      userId,
+      username,
+      role,
+      createdAt,
+      updatedAt,
+    },
+  });
 };
 
 const updateUser = async (req, res) => {
