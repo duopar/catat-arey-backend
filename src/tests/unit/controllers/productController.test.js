@@ -13,6 +13,7 @@ jest.mock('../../../config/firestore', () => ({
   collection: jest.fn().mockReturnThis(),
   where: jest.fn().mockReturnThis(),
   doc: jest.fn().mockReturnThis(),
+  add: jest.fn(),
   get: jest.fn(),
   update: jest.fn(),
 }));
@@ -106,8 +107,10 @@ describe('Validate getAllProducts controller', () => {
 });
 
 describe('Validate getProductById controller', () => {
-  it('Fail to retrieve the product by ID when server encounters an error and return 500.', async () => {
-    const mockRequest = {
+  let mockRequest;
+
+  beforeEach(() => {
+    mockRequest = {
       params: {
         productId: 'productId-001',
       },
@@ -117,7 +120,9 @@ describe('Validate getProductById controller', () => {
         }),
       },
     };
+  });
 
+  it('Fail to retrieve the product by ID when server encounters an error and return 500.', async () => {
     db.get.mockRejectedValueOnce(new Error('Database query failed.'));
 
     await getProductById(mockRequest, mockResponse);
@@ -131,17 +136,6 @@ describe('Validate getProductById controller', () => {
   });
 
   it('Successfully retrieve the product by ID and return 200.', async () => {
-    const mockRequest = {
-      params: {
-        productId: 'productId-001',
-      },
-      productSnapshot: {
-        data: () => ({
-          someProperty: 'some-value',
-        }),
-      },
-    };
-
     const mockinventoryLogSnapshots = [
       {
         empty: true,
@@ -198,5 +192,51 @@ describe('Validate getProductById controller', () => {
         data: mockData[i],
       });
     }
+  });
+});
+
+describe('Validate createProduct', () => {
+  let mockRequest;
+
+  beforeEach(() => {
+    mockRequest = {
+      body: {
+        name: 'sugar',
+        category: 'grocery',
+        price: 5000,
+        stockLevel: 10,
+        restockThreshold: 2,
+      },
+    };
+  });
+
+  it('Fail to create product when server encounters an error and return 500.', async () => {
+    db.add.mockRejectedValueOnce(new Error('Database query failed.'));
+
+    await createProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: 'Failed to create product due to server error.',
+      data: null,
+    });
+  });
+
+  it('Successfully create product and return 201.', async () => {
+    db.add.mockResolvedValueOnce({
+      id: 'productId-001',
+    });
+
+    await createProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(201);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'success',
+      message: 'Product created successfully.',
+      data: {
+        productId: 'productId-001',
+      },
+    });
   });
 });

@@ -53,7 +53,7 @@ const getProductById = async (req, res) => {
     const startTimestamp = Timestamp.fromDate(startOfDay);
     const endTimestamp = Timestamp.fromDate(endOfDay);
 
-    // query the inventoryLog collection to determine the total stock inflow and outflow for the product today.
+    // query the inventoryLog collection to determine the total stock inflow and outflow for the product today
     const inventoryLogSnapshot = await db
       .collection('inventoryLogs')
       .where('productId', '==', productId)
