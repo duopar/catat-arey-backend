@@ -201,6 +201,7 @@ const createProductLog = async (req, res) => {
       });
     }
 
+    // product snapshot from validateProductIdParam middleware
     const currentStockLevel = req.productSnapshot.data().stockLevel;
 
     await db
