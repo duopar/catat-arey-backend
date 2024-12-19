@@ -240,3 +240,41 @@ describe('Validate createProduct', () => {
     });
   });
 });
+
+describe('Validate updateProduct controller', () => {
+  let mockRequest;
+
+  beforeEach(() => {
+    mockRequest = {
+      params: {
+        productId: 'productId-001',
+      },
+    };
+  });
+
+  it('Fail to update product when server encounters an error and return 500.', async () => {
+    db.update.mockRejectedValueOnce(new Error('Database query failed.'));
+
+    await updateProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: 'Failed to update product due to server error.',
+      data: null,
+    });
+  });
+
+  it('Successfully update product and return 200', async () => {
+    await updateProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'success',
+      message: 'Product updated successfully.',
+      data: {
+        productId: 'productId-001',
+      },
+    });
+  });
+});
