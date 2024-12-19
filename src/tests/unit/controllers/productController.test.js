@@ -16,6 +16,7 @@ jest.mock('../../../config/firestore', () => ({
   add: jest.fn(),
   get: jest.fn(),
   update: jest.fn(),
+  delete: jest.fn(),
 }));
 
 const db = require('../../../config/firestore');
@@ -265,7 +266,7 @@ describe('Validate updateProduct controller', () => {
     });
   });
 
-  it('Successfully update product and return 200', async () => {
+  it('Successfully update product and return 200.', async () => {
     await updateProduct(mockRequest, mockResponse);
 
     expect(mockResponse.status).toHaveBeenCalledWith(200);
@@ -275,6 +276,42 @@ describe('Validate updateProduct controller', () => {
       data: {
         productId: 'productId-001',
       },
+    });
+  });
+});
+
+describe('Validate deleteProduct controller', () => {
+  let mockRequest;
+
+  beforeEach(() => {
+    mockRequest = {
+      params: {
+        productId: 'productId-001',
+      },
+    };
+  });
+
+  it('Fail to delete product when server encounters an error and return 500.', async () => {
+    db.delete.mockRejectedValueOnce(new Error('Database query failed.'));
+
+    await deleteProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: 'Failed to delete product due to server error.',
+      data: null,
+    });
+  });
+
+  it('Successfully delete product and return 200.', async () => {
+    await deleteProduct(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(200);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'success',
+      message: 'Product deleted successfully.',
+      data: null,
     });
   });
 });
