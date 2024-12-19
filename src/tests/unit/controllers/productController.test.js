@@ -11,6 +11,7 @@ const { createMockResponse } = require('../utils/jestMocks');
 
 jest.mock('../../../config/firestore', () => ({
   collection: jest.fn().mockReturnThis(),
+  where: jest.fn().mockReturnThis(),
   doc: jest.fn().mockReturnThis(),
   get: jest.fn(),
   update: jest.fn(),
@@ -67,13 +68,13 @@ describe('Validate getAllProducts controller', () => {
           {
             id: 'productId-001',
             data: () => ({
-              someProperties: 'some-value',
+              someProperty: 'some-value',
             }),
           },
           {
             id: 'productId-002',
             data: () => ({
-              someProperties: 'some-value',
+              someProperty: 'some-value',
             }),
           },
         ];
@@ -93,13 +94,109 @@ describe('Validate getAllProducts controller', () => {
       data: [
         {
           productId: 'productId-001',
-          someProperties: 'some-value',
+          someProperty: 'some-value',
         },
         {
           productId: 'productId-002',
-          someProperties: 'some-value',
+          someProperty: 'some-value',
         },
       ],
     });
+  });
+});
+
+describe('Validate getProductById controller', () => {
+  it('Fail to retrieve the product by ID when server encounters an error and return 500.', async () => {
+    const mockRequest = {
+      params: {
+        productId: 'productId-001',
+      },
+      productSnapshot: {
+        data: () => ({
+          someProperty: 'some-value',
+        }),
+      },
+    };
+
+    db.get.mockRejectedValueOnce(new Error('Database query failed.'));
+
+    await getProductById(mockRequest, mockResponse);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(500);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: 'Failed to retrieve the product due to server error.',
+      data: null,
+    });
+  });
+
+  it('Successfully retrieve the product by ID and return 200.', async () => {
+    const mockRequest = {
+      params: {
+        productId: 'productId-001',
+      },
+      productSnapshot: {
+        data: () => ({
+          someProperty: 'some-value',
+        }),
+      },
+    };
+
+    const mockinventoryLogSnapshots = [
+      {
+        empty: true,
+      },
+      {
+        empty: false,
+        forEach: (callback) => {
+          const docs = [
+            {
+              id: 'logId-001',
+              data: () => ({
+                changeType: 'stockIn',
+                stockChange: 5,
+              }),
+            },
+            {
+              id: 'logId-002',
+              data: () => ({
+                changeType: 'stockOut',
+                stockChange: -10,
+              }),
+            },
+          ];
+
+          docs.forEach(callback);
+        },
+      },
+    ];
+
+    const mockData = [
+      {
+        someProperty: 'some-value',
+        stockInToday: 0,
+        stockOutToday: 0,
+      },
+      {
+        someProperty: 'some-value',
+        stockInToday: 5,
+        stockOutToday: 10,
+      },
+    ];
+
+    for (let i = 0; i < mockinventoryLogSnapshots.length; i++) {
+      jest.clearAllMocks();
+
+      db.get.mockResolvedValueOnce(mockinventoryLogSnapshots[i]);
+
+      await getProductById(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'success',
+        message: 'Product retrieved successfully.',
+        data: mockData[i],
+      });
+    }
   });
 });

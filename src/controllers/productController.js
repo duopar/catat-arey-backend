@@ -40,6 +40,8 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     const productId = req.params.productId;
+
+    // product snapshot from validateProductIdParam middleware
     const product = req.productSnapshot.data();
 
     const startOfDay = new Date();
@@ -51,6 +53,7 @@ const getProductById = async (req, res) => {
     const startTimestamp = Timestamp.fromDate(startOfDay);
     const endTimestamp = Timestamp.fromDate(endOfDay);
 
+    // query the inventoryLog collection to determine the total stock inflow and outflow for the product today.
     const inventoryLogSnapshot = await db
       .collection('inventoryLogs')
       .where('productId', '==', productId)
@@ -71,6 +74,7 @@ const getProductById = async (req, res) => {
       });
     }
 
+    // add stockInToday and stockOutToday from the inventoryLog collection to the product object
     product.stockInToday = stockInToday;
     product.stockOutToday = stockOutToday;
 
