@@ -9,7 +9,6 @@ const {
 
 const { createMockResponse } = require('../utils/jestMocks');
 
-jest.mock('@google-cloud/firestore');
 jest.mock('../../../config/firestore', () => ({
   collection: jest.fn().mockReturnThis(),
   where: jest.fn().mockReturnThis(),
