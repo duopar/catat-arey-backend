@@ -2,7 +2,7 @@ name: Build, Test, and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 env:
   PROJECT_ID: catat-arey
@@ -13,27 +13,7 @@ env:
   WORKLOAD_IDENTITY_PROVIDER: projects/130212893572/locations/global/workloadIdentityPools/github-actions/providers/catat-arey-backend
 
 jobs:
-  Lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Check Code Formatting
-        run: npm run lint
-
   Test:
-    needs: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -48,6 +28,9 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      - name: Check Code Formatting
+        run: npm run lint
 
       - name: Run Unit Tests
         run: npm test
