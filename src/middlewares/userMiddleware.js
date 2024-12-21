@@ -52,7 +52,7 @@ const validateUserUpdate = async (req, res, next) => {
   }
 
   const userId = req.params.userId;
-  const decodedUserId = req.decodedUserToken.userId;
+  const decodedUserId = req.decodedUserAccessToken.userId;
 
   if (userId !== decodedUserId) {
     return res.status(401).json({

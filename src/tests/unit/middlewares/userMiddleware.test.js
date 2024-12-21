@@ -203,7 +203,7 @@ describe('Validate user update middleware', () => {
       params: {
         userId: 'someone-else-userId',
       },
-      decodedUserToken: {
+      decodedUserAccessToken: {
         userId: 'my-userId',
       },
       body: {
@@ -229,7 +229,7 @@ describe('Validate user update middleware', () => {
       params: {
         userId: 'my-userId',
       },
-      decodedUserToken: {
+      decodedUserAccessToken: {
         userId: 'my-userId',
       },
       body: {
@@ -263,7 +263,7 @@ describe('Validate user update middleware', () => {
       params: {
         userId: 'my-userId',
       },
-      decodedUserToken: {
+      decodedUserAccessToken: {
         userId: 'my-userId',
       },
       body: {
@@ -288,12 +288,12 @@ describe('Validate user update middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow request when all conditions are met', async () => {
+  it('Allow request when all conditions are met.', async () => {
     const mockRequest = {
       params: {
         userId: 'my-userId',
       },
-      decodedUserToken: {
+      decodedUserAccessToken: {
         userId: 'my-userId',
       },
       body: {

@@ -3,7 +3,7 @@ const { createMockResponse, createMockNext } = require('../utils/jestMocks');
 const {
   initializeSecrets,
   validateUserApiKey,
-  validateUserToken,
+  validateUserAccessToken,
 } = require('../../../middlewares/authMiddleware');
 
 jest.mock('jsonwebtoken');
@@ -77,31 +77,31 @@ describe('Validate API Key middleware', () => {
   });
 });
 
-describe('Validate token middleware', () => {
+describe('Validate access token middleware', () => {
   beforeAll(async () => {
     getSecret.mockResolvedValue('Bearer valid-token');
     await initializeSecrets();
   });
 
-  it('Reject request when token is missing and return 401.', async () => {
+  it('Reject request when access token is missing and return 401.', async () => {
     const mockRequest = {
       headers: {
         authorization: '',
       },
     };
 
-    await validateUserToken(mockRequest, mockResponse, mockNext);
+    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
       status: 'error',
-      message: 'Token is missing in the "authorization" header.',
+      message: 'Access token is missing in the "authorization" header.',
       data: null,
     });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject request when token format is invalid and return 401.', async () => {
+  it('Reject request when access token format is invalid and return 401.', async () => {
     const mockRequests = [
       {
         headers: {
@@ -128,19 +128,20 @@ describe('Validate token middleware', () => {
     for (const mockRequest of mockRequests) {
       jest.clearAllMocks();
 
-      await validateUserToken(mockRequest, mockResponse, mockNext);
+      await validateUserAccessToken(mockRequest, mockResponse, mockNext);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'error',
-        message: 'Invalid token format. Expected "Bearer <your-token>".',
+        message:
+          'Invalid access token format. Expected "Bearer <your-access-token>".',
         data: null,
       });
       expect(mockNext).not.toHaveBeenCalled();
     }
   });
 
-  it('Reject request when token has expired and return 401.', async () => {
+  it('Reject request when access token has expired and return 401.', async () => {
     const mockRequest = {
       headers: {
         authorization: 'Bearer expired-token',
@@ -153,18 +154,18 @@ describe('Validate token middleware', () => {
       throw error;
     });
 
-    await validateUserToken(mockRequest, mockResponse, mockNext);
+    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
       status: 'error',
-      message: 'Token has expired.',
+      message: 'Access token has expired.',
       data: null,
     });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Reject request when token is invalid and return 401.', async () => {
+  it('Reject request when access token is invalid and return 401.', async () => {
     const mockRequest = {
       headers: {
         authorization: 'Bearer invalid-token',
@@ -177,25 +178,25 @@ describe('Validate token middleware', () => {
       throw error;
     });
 
-    await validateUserToken(mockRequest, mockResponse, mockNext);
+    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
       status: 'error',
-      message: 'Token is invalid.',
+      message: 'Access token is invalid.',
       data: null,
     });
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow request when token is valid.', async () => {
+  it('Allow request when access token is valid.', async () => {
     const mockRequest = {
       headers: {
         authorization: 'Bearer valid-token',
       },
     };
 
-    await validateUserToken(mockRequest, mockResponse, mockNext);
+    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).not.toHaveBeenCalled();
     expect(mockResponse.json).not.toHaveBeenCalled();

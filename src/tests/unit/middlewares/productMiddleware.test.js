@@ -27,7 +27,7 @@ beforeEach(() => {
 describe('Validate user role middleware', () => {
   it('Reject request when role is not "owner" and return 401.', () => {
     const mockRequest = {
-      decodedUserToken: {
+      decodedUserAccessToken: {
         role: 'employee',
       },
     };
@@ -46,7 +46,7 @@ describe('Validate user role middleware', () => {
 
   it('Allow request when role is "owner".', () => {
     const mockRequest = {
-      decodedUserToken: {
+      decodedUserAccessToken: {
         role: 'owner',
       },
     };
@@ -223,7 +223,7 @@ describe('Validate create or update product middleware', () => {
     }
   });
 
-  it('Allow request when all conditions are met', async () => {
+  it('Allow request when all conditions are met.', async () => {
     const mockRequests = [
       // request for creating product
       {
@@ -356,7 +356,7 @@ describe('Validate create product log middleware', () => {
     expect(mockNext).not.toHaveBeenCalled();
   });
 
-  it('Allow request when all conditions are met', () => {
+  it('Allow request when all conditions are met.', () => {
     const mockRequest = {
       productSnapshot: {
         data: () => ({

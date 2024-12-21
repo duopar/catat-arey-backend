@@ -2,7 +2,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Timestamp } = require('@google-cloud/firestore');
 const db = require('../config/firestore');
-const { getJwtSecret } = require('../middlewares/authMiddleware');
+const {
+  getAccessTokenSecret,
+  getRefreshTokenSecret,
+} = require('../middlewares/authMiddleware');
 
 const register = async (req, res) => {
   try {
@@ -38,11 +41,24 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { userId, username, role } = req.userData;
 
-  const JWT_SECRET = getJwtSecret();
+  const ACCESS_TOKEN_SECRET = getAccessTokenSecret();
+  const REFRESH_TOKEN_SECRET = getRefreshTokenSecret();
 
-  const token = jwt.sign({ userId, username, role }, JWT_SECRET, {
-    expiresIn: '1h',
-  });
+  const accessToken = jwt.sign(
+    { userId, username, role },
+    ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: '10m',
+    }
+  );
+
+  const refreshToken = jwt.sign(
+    { userId, username, role },
+    REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: '7d',
+    }
+  );
 
   return res.status(200).json({
     status: 'success',
@@ -50,7 +66,30 @@ const login = async (req, res) => {
     data: {
       userId,
       username,
-      token,
+      accessToken,
+      refreshToken,
+    },
+  });
+};
+
+const refresh = (req, res) => {
+  const { userId, username, role } = req.decodedUserRefreshToken;
+
+  const ACCESS_TOKEN_SECRET = getAccessTokenSecret();
+
+  const accessToken = jwt.sign(
+    { userId, username, role },
+    ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: '10m',
+    }
+  );
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Successfully retrieved access token.',
+    data: {
+      accessToken,
     },
   });
 };
@@ -58,4 +97,5 @@ const login = async (req, res) => {
 module.exports = {
   register,
   login,
+  refresh,
 };

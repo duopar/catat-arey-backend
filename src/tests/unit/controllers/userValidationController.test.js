@@ -74,7 +74,9 @@ describe('Validate login controller', () => {
       },
     };
 
-    jwt.sign.mockReturnValue('my-token');
+    jwt.sign
+      .mockReturnValueOnce('my-access-token')
+      .mockReturnValueOnce('my-refresh-token');
 
     await login(mockRequest, mockResponse);
 
@@ -85,7 +87,8 @@ describe('Validate login controller', () => {
       data: {
         userId: 'my-userId',
         username: 'testUser',
-        token: 'my-token',
+        accessToken: 'my-access-token',
+        refreshToken: 'my-refresh-token',
       },
     });
   });

@@ -3,7 +3,7 @@ const db = require('../config/firestore');
 
 const validateUserRole = (req, res, next) => {
   // decoded jwt token from validateUserToken middleware
-  const decodedUserRole = req.decodedUserToken.role;
+  const decodedUserRole = req.decodedUserAccessToken.role;
 
   if (decodedUserRole !== 'owner') {
     return res.status(401).json({
