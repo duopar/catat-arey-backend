@@ -1,10 +1,6 @@
 const userValidationRouter = require('express').Router();
 
 const {
-  validateUserRefreshToken,
-} = require('../middlewares/authMiddleware.js');
-
-const {
   validateUserRegistration,
   validateUserLogin,
 } = require('../middlewares/userValidationMiddleware');
@@ -17,6 +13,6 @@ const {
 
 userValidationRouter.post('/register', validateUserRegistration, register);
 userValidationRouter.post('/login', validateUserLogin, login);
-userValidationRouter.post('/refresh', validateUserRefreshToken, refresh);
+userValidationRouter.post('/refresh', refresh);
 
 module.exports = userValidationRouter;

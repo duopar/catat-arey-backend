@@ -3,7 +3,7 @@ const { createMockResponse, createMockNext } = require('../utils/jestMocks');
 const {
   initializeSecrets,
   validateUserApiKey,
-  validateUserAccessToken,
+  validateUserAccessOrRefreshToken,
 } = require('../../../middlewares/authMiddleware');
 
 jest.mock('jsonwebtoken');
@@ -77,129 +77,236 @@ describe('Validate API Key middleware', () => {
   });
 });
 
-describe('Validate access token middleware', () => {
+describe('Validate access or refresh token middleware', () => {
   beforeAll(async () => {
     getSecret.mockResolvedValue('Bearer valid-token');
     await initializeSecrets();
   });
 
-  it('Reject request when access token is missing and return 401.', async () => {
-    const mockRequest = {
-      headers: {
-        authorization: '',
-      },
-    };
-
-    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(401);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'error',
-      message: 'Access token is missing in the "authorization" header.',
-      data: null,
-    });
-    expect(mockNext).not.toHaveBeenCalled();
-  });
-
-  it('Reject request when access token format is invalid and return 401.', async () => {
+  it('Reject request when access or refresh token is missing and return 401.', async () => {
     const mockRequests = [
       {
+        path: '',
         headers: {
-          authorization: 'invalid-token',
+          authorization: '',
         },
       },
       {
+        path: '/refresh',
         headers: {
-          authorization: 'Bearer',
-        },
-      },
-      {
-        headers: {
-          authorization: 'Bearer valid-token bar',
-        },
-      },
-      {
-        headers: {
-          authorization: 'foo valid-token bar',
+          authorization: '',
         },
       },
     ];
 
-    for (const mockRequest of mockRequests) {
+    const tokenTypes = ['Access', 'Refresh'];
+
+    for (let i = 0; i < mockRequests.length; i++) {
       jest.clearAllMocks();
 
-      await validateUserAccessToken(mockRequest, mockResponse, mockNext);
+      await validateUserAccessOrRefreshToken(
+        mockRequests[i],
+        mockResponse,
+        mockNext
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'error',
-        message:
-          'Invalid access token format. Expected "Bearer <your-access-token>".',
+        message: `${tokenTypes[i]} token is missing in the "authorization" header.`,
         data: null,
       });
       expect(mockNext).not.toHaveBeenCalled();
     }
   });
 
-  it('Reject request when access token has expired and return 401.', async () => {
-    const mockRequest = {
-      headers: {
-        authorization: 'Bearer expired-token',
+  it('Reject request when access or refresh token format is invalid and return 401.', async () => {
+    const mockRequests = [
+      {
+        path: '',
+        headers: {
+          authorization: 'invalid-token',
+        },
       },
-    };
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'invalid-token',
+        },
+      },
+      {
+        path: '',
+        headers: {
+          authorization: 'Bearer',
+        },
+      },
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'Bearer',
+        },
+      },
+      {
+        path: '',
+        headers: {
+          authorization: 'Bearer valid-token bar',
+        },
+      },
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'Bearer valid-token bar',
+        },
+      },
+      {
+        path: '',
+        headers: {
+          authorization: 'foo valid-token bar',
+        },
+      },
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'foo valid-token bar',
+        },
+      },
+    ];
 
-    jwt.verify.mockImplementationOnce(() => {
-      const error = new Error('jwt has expired');
-      error.name = 'TokenExpiredError';
-      throw error;
-    });
+    const tokenTypes = ['access', 'refresh'];
 
-    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
+    for (let i = 0; i < mockRequests.length; i++) {
+      jest.clearAllMocks();
 
-    expect(mockResponse.status).toHaveBeenCalledWith(401);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'error',
-      message: 'Access token has expired.',
-      data: null,
-    });
-    expect(mockNext).not.toHaveBeenCalled();
+      await validateUserAccessOrRefreshToken(
+        mockRequests[i],
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: `Invalid ${tokenTypes[i % 2]} token format. Expected "Bearer <your-${tokenTypes[i % 2]}-token>".`,
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    }
   });
 
-  it('Reject request when access token is invalid and return 401.', async () => {
-    const mockRequest = {
-      headers: {
-        authorization: 'Bearer invalid-token',
+  it('Reject request when access or refresh token has expired and return 401.', async () => {
+    const mockRequests = [
+      {
+        path: '',
+        headers: {
+          authorization: 'Bearer expired-token',
+        },
       },
-    };
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'Bearer expired-token',
+        },
+      },
+    ];
 
-    jwt.verify.mockImplementationOnce(() => {
-      const error = new Error('jwt is invalid');
-      error.name = 'JsonWebTokenError';
-      throw error;
-    });
+    const tokenTypes = ['Access', 'Refresh'];
 
-    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
+    for (let i = 0; i < mockRequests.length; i++) {
+      jest.clearAllMocks();
 
-    expect(mockResponse.status).toHaveBeenCalledWith(401);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'error',
-      message: 'Access token is invalid.',
-      data: null,
-    });
-    expect(mockNext).not.toHaveBeenCalled();
+      jwt.verify.mockImplementationOnce(() => {
+        const error = new Error('jwt has expired');
+        error.name = 'TokenExpiredError';
+        throw error;
+      });
+
+      await validateUserAccessOrRefreshToken(
+        mockRequests[i],
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: `${tokenTypes[i]} token has expired.`,
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    }
   });
 
-  it('Allow request when access token is valid.', async () => {
-    const mockRequest = {
-      headers: {
-        authorization: 'Bearer valid-token',
+  it('Reject request when access or refresh token is invalid and return 401.', async () => {
+    const mockRequests = [
+      {
+        path: '',
+        headers: {
+          authorization: 'Bearer invalid-token',
+        },
       },
-    };
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'Bearer invalid-token',
+        },
+      },
+    ];
 
-    await validateUserAccessToken(mockRequest, mockResponse, mockNext);
+    const tokenTypes = ['Access', 'Refresh'];
 
-    expect(mockResponse.status).not.toHaveBeenCalled();
-    expect(mockResponse.json).not.toHaveBeenCalled();
-    expect(mockNext).toHaveBeenCalled();
+    for (let i = 0; i < mockRequests.length; i++) {
+      jest.clearAllMocks();
+
+      jwt.verify.mockImplementationOnce(() => {
+        const error = new Error('jwt is invalid');
+        error.name = 'JsonWebTokenError';
+        throw error;
+      });
+
+      await validateUserAccessOrRefreshToken(
+        mockRequests[i],
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'error',
+        message: `${tokenTypes[i]} token is invalid.`,
+        data: null,
+      });
+      expect(mockNext).not.toHaveBeenCalled();
+    }
+  });
+
+  it('Allow request when access or refresh token is valid.', async () => {
+    const mockRequests = [
+      {
+        path: '',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+      },
+      {
+        path: '/refresh',
+        headers: {
+          authorization: 'Bearer valid-token',
+        },
+      },
+    ];
+
+    for (let i = 0; i < mockRequests.length; i++) {
+      jest.clearAllMocks();
+
+      await validateUserAccessOrRefreshToken(
+        mockRequests[i],
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockResponse.status).not.toHaveBeenCalled();
+      expect(mockResponse.json).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+    }
   });
 });

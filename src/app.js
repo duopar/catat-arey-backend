@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const {
   validateUserApiKey,
-  validateUserAccessToken,
+  validateUserAccessOrRefreshToken,
 } = require('./middlewares/authMiddleware');
 
 const apiRouter = require('./routes');
@@ -21,10 +21,10 @@ app.use(cors());
 
 app.use(validateUserApiKey);
 app.use((req, res, next) => {
-  if (req.path.includes('/auth')) {
+  if (req.path.includes('/auth') && !req.path.includes('/refresh')) {
     return next();
   }
-  validateUserAccessToken(req, res, next);
+  validateUserAccessOrRefreshToken(req, res, next);
 });
 
 app.use('/api/v1', apiRouter);
