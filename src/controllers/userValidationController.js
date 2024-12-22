@@ -48,7 +48,7 @@ const login = async (req, res) => {
     { userId, username, role },
     ACCESS_TOKEN_SECRET,
     {
-      expiresIn: '10m',
+      expiresIn: '1d',
     }
   );
 
@@ -81,7 +81,7 @@ const refresh = (req, res) => {
     { userId, username, role },
     ACCESS_TOKEN_SECRET,
     {
-      expiresIn: '10m',
+      expiresIn: '1d',
     }
   );
 
