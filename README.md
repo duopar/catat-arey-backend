@@ -22,7 +22,7 @@ Registers a new user in the system.
   ```
 
 ### **Responses**
-- **201 Created**  
+- **`201 Created`**  
   Registration successful.
   - **Example Response**:
     ```json
@@ -35,7 +35,7 @@ Registers a new user in the system.
     }
     ```
 
-- **400 Bad Request**  
+- **`400 Bad Request`**  
   Occurs when required fields are not valid or missing.
   - **Reason**: Missing field.
   - **Example Response**:
@@ -56,7 +56,7 @@ Registers a new user in the system.
     }
     ```
 
-- **409 Conflict**  
+- **`409 Conflict`**  
   Occurs when the `username` is already registered.
   - **Example Response**:
     ```json
@@ -67,7 +67,7 @@ Registers a new user in the system.
     }
     ```
 
-- **500 Internal Server Error**  
+- **`500 Internal Server Error`**  
   Occurs when the server encounters an unexpected error.
   - **Example Response**:
     ```json
@@ -96,7 +96,7 @@ Authenticates a user and generates access and refresh tokens.
   ```
 
 ### **Responses**
-- **200 OK**  
+- **`200 OK`**  
   Login successful.
   - **Example Response**:
     ```json
@@ -112,7 +112,7 @@ Authenticates a user and generates access and refresh tokens.
     }
     ```
 
-- **400 Bad Request**  
+- **`400 Bad Request`**  
   Occurs when required fields are not valid or missing.
   - **Example Response**:
     ```json
@@ -123,7 +123,7 @@ Authenticates a user and generates access and refresh tokens.
     }
     ```
 
-- **401 Unauthorized**  
+- **`401 Unauthorized`**  
   Occurs when the `username` is not found or the `password` is invalid.
   - **Example Response**:
     ```json
@@ -134,7 +134,7 @@ Authenticates a user and generates access and refresh tokens.
     }
     ```
 
-- **500 Internal Server Error**  
+- **`500 Internal Server Error`**  
   Occurs when the server encounters an unexpected error.
   - **Example Response**:
     ```json
@@ -157,7 +157,7 @@ Generates a new access token using a valid refresh token.
   - `Authorization: Bearer <refresh-token>` (required)
 
 ### **Responses**
-- **200 OK**  
+- **`200 OK`**  
   Refresh successful.
   - **Example Response**:
     ```json
@@ -170,7 +170,7 @@ Generates a new access token using a valid refresh token.
     }
     ```
 
-- **401 Unauthorized**  
+- **`401 Unauthorized`**  
   Occurs when the provided refresh token is invalid or expired.
   - **Reason**: Missing refresh token.
   - **Example Response**:
