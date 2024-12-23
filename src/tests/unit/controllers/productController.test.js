@@ -29,10 +29,14 @@ beforeEach(() => {
 
 describe('Validate getAllProducts controller', () => {
   it('Fail to retrieve all products when there are no products and return 404.', async () => {
-    const mockRequest = {};
+    const mockRequest = {
+      query: {
+        name: '',
+      },
+    };
 
     db.get.mockResolvedValueOnce({
-      empty: true,
+      forEach() {},
     });
 
     await getAllProducts(mockRequest, mockResponse);
@@ -61,49 +65,76 @@ describe('Validate getAllProducts controller', () => {
   });
 
   it('Successfully retrieve all products and return 200.', async () => {
-    const mockRequest = {};
+    const mockRequests = [
+      {
+        query: {},
+      },
+      {
+        query: {
+          name: 'some-product-name',
+        },
+      },
+    ];
 
-    db.get.mockResolvedValueOnce({
-      empty: false,
-      forEach: (callback) => {
-        const docs = [
+    const mockProducts = [
+      [
+        {
+          productId: 'productId-001',
+          name: 'some-product-name',
+          someProperty: 'some-value',
+        },
+        {
+          productId: 'productId-002',
+          name: 'another-product-name',
+          someProperty: 'some-value',
+        },
+      ],
+      [
+        {
+          productId: 'productId-001',
+          name: 'some-product-name',
+          someProperty: 'some-value',
+        },
+      ],
+    ];
+
+    let mockProductsIndex = 0;
+
+    for (const mockRequest of mockRequests) {
+      jest.clearAllMocks();
+
+      db.get.mockResolvedValueOnce({
+        empty: false,
+        docs: [
           {
             id: 'productId-001',
             data: () => ({
+              name: 'some-product-name',
               someProperty: 'some-value',
             }),
           },
           {
             id: 'productId-002',
             data: () => ({
+              name: 'another-product-name',
               someProperty: 'some-value',
             }),
           },
-        ];
-
-        for (const doc of docs) {
-          callback(doc);
-        }
-      },
-    });
-
-    await getAllProducts(mockRequest, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(200);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'success',
-      message: 'All product retrieved successfully.',
-      data: [
-        {
-          productId: 'productId-001',
-          someProperty: 'some-value',
+        ],
+        forEach(callback) {
+          return this.docs.forEach(callback);
         },
-        {
-          productId: 'productId-002',
-          someProperty: 'some-value',
-        },
-      ],
-    });
+      });
+
+      await getAllProducts(mockRequest, mockResponse);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        status: 'success',
+        message: 'All products retrieved successfully.',
+        data: mockProducts[mockProductsIndex++],
+      });
+    }
   });
 });
 

@@ -17,6 +17,22 @@ const validateUserRole = (req, res, next) => {
   next();
 };
 
+const validateProductQueryParam = (req, res, next) => {
+  const validParams = ['name'];
+
+  for (const param of Object.keys(req.query)) {
+    if (!validParams.includes(param)) {
+      return res.status(400).json({
+        status: 'error',
+        message: `Invalid query parameter: "${param}".`,
+        data: null,
+      });
+    }
+  }
+
+  next();
+};
+
 const validateProductIdParam = async (req, res, next) => {
   const productId = req.params.productId;
   const productSnapshot = await db.collection('products').doc(productId).get();
@@ -133,6 +149,7 @@ const validateCreateProductLog = (req, res, next) => {
 
 module.exports = {
   validateUserRole,
+  validateProductQueryParam,
   validateProductIdParam,
   validateCreateOrUpdateProduct,
   validateCreateProductLog,

@@ -2,6 +2,7 @@ const productRouter = require('express').Router();
 
 const {
   validateUserRole,
+  validateProductQueryParam,
   validateProductIdParam,
   validateCreateOrUpdateProduct,
   validateCreateProductLog,
@@ -16,7 +17,7 @@ const {
   createProductLog,
 } = require('../controllers/productController');
 
-productRouter.get('/', getAllProducts);
+productRouter.get('/', validateProductQueryParam, getAllProducts);
 productRouter.get('/:productId', validateProductIdParam, getProductById);
 productRouter.post(
   '/',

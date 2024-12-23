@@ -1,5 +1,6 @@
 const {
   validateUserRole,
+  validateProductQueryParam,
   validateProductIdParam,
   validateCreateOrUpdateProduct,
   validateCreateProductLog,
@@ -52,6 +53,40 @@ describe('Validate user role middleware', () => {
     };
 
     validateUserRole(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.status).not.toHaveBeenCalled();
+    expect(mockResponse.json).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
+  });
+});
+
+describe('Validate product query parameters middleware', () => {
+  it('Reject request when query parameters is invalid and return 400.', () => {
+    const mockRequest = {
+      query: {
+        someInvalidKey: 'some-invalid-value',
+      },
+    };
+
+    validateProductQueryParam(mockRequest, mockResponse, mockNext);
+
+    expect(mockResponse.status).toHaveBeenCalledWith(400);
+    expect(mockResponse.json).toHaveBeenCalledWith({
+      status: 'error',
+      message: `Invalid query parameter: "${Object.keys(mockRequest.query)[0]}".`,
+      data: null,
+    });
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('Allow request when query parameter is valid.', () => {
+    const mockRequest = {
+      query: {
+        name: 'some-product-name',
+      },
+    };
+
+    validateProductQueryParam(mockRequest, mockResponse, mockNext);
 
     expect(mockResponse.status).not.toHaveBeenCalled();
     expect(mockResponse.json).not.toHaveBeenCalled();

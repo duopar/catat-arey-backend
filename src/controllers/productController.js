@@ -3,17 +3,18 @@ const db = require('../config/firestore');
 
 const getAllProducts = async (req, res) => {
   try {
-    const productSnapshot = await db.collection('products').get();
-
-    if (productSnapshot.empty) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'No products found.',
-        data: null,
-      });
-    }
+    let productSnapshot = await db.collection('products').get();
 
     let products = [];
+
+    const { name } = req.query;
+
+    if (name) {
+      productSnapshot = productSnapshot.docs.filter((doc) => {
+        const productName = doc.data().name.toLowerCase();
+        return productName.includes(name.toLowerCase());
+      });
+    }
 
     productSnapshot.forEach((doc) => {
       products.push({
@@ -22,9 +23,17 @@ const getAllProducts = async (req, res) => {
       });
     });
 
+    if (products.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No products found.',
+        data: null,
+      });
+    }
+
     return res.status(200).json({
       status: 'success',
-      message: 'All product retrieved successfully.',
+      message: 'All products retrieved successfully.',
       data: products,
     });
   } catch (error) {
