@@ -4,11 +4,11 @@ Endpoints used for user authentication, including registration, login, and token
 
 ---
 
-## 1. **POST** `/auth/register`
+## 1. POST `/auth/register`
 
 Registers a new user in the system.
 
-### **Request**
+### Request
 - **Headers**:
   - `X-API-Key: <api-key>` (required)
 - **Body**:
@@ -21,7 +21,7 @@ Registers a new user in the system.
   }
   ```
 
-### **Responses**
+### Responses
 - **`201 Created`**  
   Registration successful.
   - **Example Response**:
@@ -80,11 +80,11 @@ Registers a new user in the system.
 
 ---
 
-## 2. **POST** `/auth/login`
+## 2. POST `/auth/login`
 
 Authenticates a user and generates access and refresh tokens.
 
-### **Request**
+### Request
 - **Headers**:
   - `X-API-Key: <api-key>` (required)
 - **Body**:
@@ -95,7 +95,7 @@ Authenticates a user and generates access and refresh tokens.
   }
   ```
 
-### **Responses**
+### Responses
 - **`200 OK`**  
   Login successful.
   - **Example Response**:
@@ -147,16 +147,16 @@ Authenticates a user and generates access and refresh tokens.
 
 ---
 
-## 3. **POST** `/auth/refresh`
+## 3. POST `/auth/refresh`
 
 Generates a new access token using a valid refresh token.
 
-### **Request**
+### Request
 - **Headers**:
   - `X-API-Key: <api-key>` (required)
   - `Authorization: Bearer <refresh-token>` (required)
 
-### **Responses**
+### Responses
 - **`200 OK`**  
   Refresh successful.
   - **Example Response**:
