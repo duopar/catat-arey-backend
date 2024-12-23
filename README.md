@@ -1,4 +1,4 @@
-# A. **Authentication Endpoints**
+# A. Authentication Endpoints
 
 Endpoints used for user authentication, including registration, login, and token refresh.
 
@@ -210,30 +210,88 @@ Generates a new access token using a valid refresh token.
     ```
 
 ---
-
-## 2. **User Management Endpoints**
+  
+# B. User Management Endpoints
    
-Used to manage user data.
+Endpoints used to manage user data, including retrieving user details and updating a user's password.
 
-- ### **GET** `/users/{userId}`
-  - **Description**: Get user details.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
+## 1. GET `/users/{userId}`
 
-- ### **PATCH** `/users/{userId}`
-  - **Description**: Update user password.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
-  - **Body**:
+Retrieve the details of a specific user by their `userId`.
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+
+### Responses
+- **`200 OK`**  
+  Retrieve successful.
+  - **Example Response**:
     ```json
     {
-      "currentPassword": "string",
-      "newPassword": "string",
-      "confirmPassword": "string"
+      "status": "success",
+      "message": "User data retrieved successfully.",
+      "data": {
+        "userId": "string",
+        "username": "string",
+        "role": "string",
+        "createdAt": "timestamp",
+        "updatedAt": "timestamp"
+      }
     }
     ```
+    
+- **`404 Not Found`**
+  User with the provided `userId` does not exist.
+  - **Example Response**:
+    ```json
+    {
+      "status": "error",
+      "message": "No user found with the provided ID.",
+      "data": null
+    }
+    ```
+
+## 2. PATCH `/users/{userId}`
+
+Update the `password` of the specified user.
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+- **Body**:
+  ```json
+  {
+    "currentPassword": "string",
+    "newPassword": "string",
+    "confirmPassword": "string"
+  }
+  ```
+
+### Responses
+- **`200 OK`**
+  Password update is successful.
+  - **Example Response**:
+    ```json
+    {
+      "status": "success",
+      "message": "Password updated successfully.",
+      "data": null
+    }
+    ```
+
+- **`400 Bad Request`**
+  Invalid `password`.
+  - **Example Response**:
+  ```json
+  {
+    "status": "success",
+    "message": "\"newPassword\" must be between 8-30 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+    "data": null
+  }
+  ```
 
 ---
 
