@@ -24,7 +24,7 @@ Registers a new user in the system.
 ### Responses
 - **`201 Created`**  
   Registration successful.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "success",
@@ -38,7 +38,7 @@ Registers a new user in the system.
 - **`400 Bad Request`**  
   Occurs when required fields are not valid or missing.
   - **Reason**: Missing field.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -47,7 +47,7 @@ Registers a new user in the system.
     }
     ```
   - **Reason**: Invalid `password`.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -58,7 +58,7 @@ Registers a new user in the system.
 
 - **`409 Conflict`**  
   Occurs when the `username` is already registered.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -69,7 +69,7 @@ Registers a new user in the system.
 
 - **`500 Internal Server Error`**  
   Occurs when the server encounters an unexpected error.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -98,7 +98,7 @@ Authenticates a user and generates access and refresh tokens.
 ### Responses
 - **`200 OK`**  
   Login successful.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "success",
@@ -114,7 +114,7 @@ Authenticates a user and generates access and refresh tokens.
 
 - **`400 Bad Request`**  
   Occurs when required fields are not valid or missing.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -125,7 +125,7 @@ Authenticates a user and generates access and refresh tokens.
 
 - **`401 Unauthorized`**  
   Occurs when the `username` is not found or the `password` is invalid.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -136,7 +136,7 @@ Authenticates a user and generates access and refresh tokens.
 
 - **`500 Internal Server Error`**  
   Occurs when the server encounters an unexpected error.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -159,7 +159,7 @@ Generates a new access token using a valid refresh token.
 ### Responses
 - **`200 OK`**  
   Refresh successful.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "success",
@@ -173,7 +173,7 @@ Generates a new access token using a valid refresh token.
 - **`401 Unauthorized`**  
   Occurs when the provided refresh token is invalid or expired.
   - **Reason**: Missing refresh token.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -182,7 +182,7 @@ Generates a new access token using a valid refresh token.
     }
     ```
   - **Reason**: Invalid refresh token format.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -191,7 +191,7 @@ Generates a new access token using a valid refresh token.
     }
     ```
   - **Reason**: Expired refresh token.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -200,7 +200,7 @@ Generates a new access token using a valid refresh token.
     }
     ```
   - **Reason**: Invalid refresh token.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -227,7 +227,7 @@ Retrieve the details of a specific user by their `userId`.
 ### Responses
 - **`200 OK`**  
   Retrieve successful.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "success",
@@ -244,7 +244,7 @@ Retrieve the details of a specific user by their `userId`.
     
 - **`404 Not Found`**
   User with the provided `userId` does not exist.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "error",
@@ -273,7 +273,7 @@ Update the `password` of the specified user.
 ### Responses
 - **`200 OK`**
   Password update is successful.
-  - **Example Response**:
+  - **Example**:
     ```json
     {
       "status": "success",
@@ -284,7 +284,7 @@ Update the `password` of the specified user.
 
 - **`400 Bad Request`**
   Invalid `password`.
-  - **Example Response**:
+  - **Example**:
   ```json
   {
     "status": "success",
