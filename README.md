@@ -242,7 +242,7 @@ Retrieve the details of a specific user by their `userId`.
     }
     ```
     
-- **`404 Not Found`**
+- **`404 Not Found`**  
   User with the provided `userId` does not exist.
   - **Example**:
     ```json
@@ -271,7 +271,7 @@ Update the `password` of the specified user.
   ```
 
 ### Responses
-- **`200 OK`**
+- **`200 OK`**  
   Password update is successful.
   - **Example**:
     ```json
@@ -282,7 +282,7 @@ Update the `password` of the specified user.
     }
     ```
 
-- **`400 Bad Request`**
+- **`400 Bad Request`**  
   Invalid `password`.
   - **Example**:
   ```json
@@ -295,16 +295,70 @@ Update the `password` of the specified user.
 
 ---
 
-## 3. **Product Management Endpoints**
+# C. Product Management Endpoints
 
-Used to manage product inventory.
+Endpoints used to manage product inventory.
 
-- ### **GET** `/products`
-  - **Deskripsi**: Get a list of all products.
+- ## 1. GET `/products`
+  - **Description**: Retrieve a list of all products. Supports optional filtering by name.
   - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
-
+    - `X-API-Key: <api-key>` - API key to authenticate requests.
+    - `Authorization: Bearer <token>` - Bearer token for user authentication.
+  - **Query Parameters**:
+    - `name` *(optional)*: A string to filter products by name. Case-insensitive.
+  - **Responses**:
+    - **200 OK**:
+      - **Description**: Successfully retrieved the list of products.
+      - **Body**:
+        ```json
+        {
+          "status": "success",
+          "message": "All products retrieved successfully.",
+          "data": [
+            {
+              "productId": "string",
+              "name": "string",
+              "category": "string",
+              "price": "number",
+              "stockLevel": "number",
+              "restockThreshold": "number",
+              "createdAt": "timestamp",
+              "updatedAt": "timestamp"
+            }
+          ]
+        }
+        ```
+    - **404 Not Found**:
+      - **Description**: No products were found matching the criteria.
+      - **Body**:
+        ```json
+        {
+          "status": "error",
+          "message": "No products found.",
+          "data": null
+        }
+        ```
+    - **400 Bad Request**:
+      - **Description**: Invalid query parameter provided.
+      - **Body**:
+        ```json
+        {
+          "status": "error",
+          "message": "Invalid query parameter: \"<parameter-name>\".",
+          "data": null
+        }
+        ```
+    - **500 Internal Server Error**:
+      - **Description**: Server encountered an error while processing the request.
+      - **Body**:
+        ```json
+        {
+          "status": "error",
+          "message": "Failed to retrieve all products due to server error.",
+          "data": null
+        }
+        ```
+        
 - ### **GET** `/products/{productId}`
   - **Deskripsi**: Get product details by ID.
   - **Headers**:
