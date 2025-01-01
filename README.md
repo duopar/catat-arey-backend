@@ -683,7 +683,7 @@ Creates a log entry for a specific product identified by `productId`.
   ```json
   {
     "status": "error",
-    "message": "\"stockOut\" must be less than or equal to the current product\'s \"stockLevel\".",
+    "message": "\"stockOut\" must be less than or equal to the current product's \"stockLevel\".",
     "data": null
   }
   ```
