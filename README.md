@@ -310,7 +310,7 @@ Retrieve a list of all products. Supports optional filtering by name.
 - **Query Parameters**:
   - `name` *(optional)*: A string to filter products by name. Case-insensitive.
 
-### Responses:
+### Responses
 - **`200 OK`**  
   Successfully retrieved the list of products.
   - **Example**:
@@ -363,11 +363,57 @@ Retrieve a list of all products. Supports optional filtering by name.
   }
   ```
         
-- ### **GET** `/products/{productId}`
-  - **Deskripsi**: Get product details by ID.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
+## 2. GET `/products/{productId}`
+
+Retrieves detailed information about a specific product by its ID, including daily stock activity metrics (`stockInToday` and `stockOutToday`).
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+
+### Responses
+- **`200 OK`**  
+  Successfully retrieved the product.
+  ```json
+  {
+    "status": "success",
+    "message": "Product retrieved successfully.",
+    "data": {
+      "productId": "string",
+      "name": "string",
+      "category": "string",
+      "price": "number",
+      "stockLevel": "number",
+      "restockThreshold": "number",
+      "stockInToday": "number",
+      "stockOutToday": "number"
+    }
+  }
+  ```
+  - **Explanation**:
+    - `stockInToday`: The total number of items added to stock for the product today.
+    - `stockOutToday`: The total number of items removed from stock for the product today.
+
+- **`404 Not Found`**  
+  No products were found matching the `productId`.
+  ```json
+  {
+    "status": "error",
+    "message": "No product found with the provided ID.",
+    "data": null
+  }
+  ```
+
+- **`500 Internal Server Error`**  
+  Server encountered an error while processing the request.
+  ```json
+  {
+    "status": "error",
+    "message": "Failed to retrieve the product due to server error.",
+    "data": null
+  }
+  ```
 
 - ### **POST** `/products`
   - **Deskripsi**: Add new product to inventory. **Only users with 'owner' role can add products**.
