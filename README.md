@@ -375,6 +375,7 @@ Retrieves detailed information about a specific product by its ID, including dai
 ### Responses
 - **`200 OK`**  
   Successfully retrieved the product.
+  - **Example**:
   ```json
   {
     "status": "success",
@@ -397,6 +398,7 @@ Retrieves detailed information about a specific product by its ID, including dai
 
 - **`404 Not Found`**  
   No products were found matching the `productId`.
+  - **Example**:
   ```json
   {
     "status": "error",
@@ -407,6 +409,7 @@ Retrieves detailed information about a specific product by its ID, including dai
 
 - **`500 Internal Server Error`**  
   Server encountered an error while processing the request.
+  - **Example**:
   ```json
   {
     "status": "error",
@@ -415,40 +418,304 @@ Retrieves detailed information about a specific product by its ID, including dai
   }
   ```
 
-- ### **POST** `/products`
-  - **Deskripsi**: Add new product to inventory. **Only users with 'owner' role can add products**.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
-  - **Body**:
-    ```json
-    {
-      "name": "string",
-      "category": "string",
-      "price": "number",
-      "stockLevel": "number",
-      "restockThreshold": "number"
-    }
-    ```
+## 3. POST `/products`
 
-- ### **PUT** `/products/{productId}`
-  - **Deskripsi**: Update product information. **Only users with 'owner' role can update products**.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
-  - **Body**:
-    ```json
-    {
-      "name": "string (optional)",
-      "category": "string (optional)",
-      "price": "number (optional)",
-      "stockLevel": "number (optional)",
-      "restockThreshold": "number (optional)"
-    }
-    ```
+Adds a new product to the inventory. **Only users with the 'owner' role are authorized to add products**.
 
-- ### **DELETE** `/products/{productId}`
-  - **Deskripsi**: Delete product from inventory. **Only users with 'owner' role can delete products**.
-  - **Headers**:
-    - `X-API-Key: <api-key>`
-    - `Authorization: Bearer <token>`
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+- **Body**:
+  ```json
+  {
+    "name": "string",
+    "category": "string",
+    "price": "number",
+    "stockLevel": "number",
+    "restockThreshold": "number"
+  }
+  ```
+
+### Responses
+- **`201 Created`**  
+  Product successfully created.
+  - **Example**:
+  ```json
+  {
+    "status": "success",
+    "message": "Product created successfully.",
+    "data": {
+      "productId": "12345"
+    }
+  }
+  ```
+
+- **`400 Bad Request`**  
+  Invalid request body.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "\"price\" must be a number",
+    "data": null
+  }
+  ```
+
+- **`401 Unauthorized`**  
+  User does not have the required role.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Only users with the 'owner' role are authorized to add, update, or delete products.",
+    "data": null
+  }
+  ```
+
+- **`409 Conflict`**  
+  A product with the same name already exists.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Product already exists.",
+    "data": null
+  }
+  ```
+
+- **`500 Internal Server Error`**  
+  Server error occurred while creating the product.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Failed to create product due to server error.",
+    "data": null
+  }
+  ```
+
+## 4. PUT `/products/{productId}`
+
+Updates the details of a specific product in the inventory. **Only users with the 'owner' role are authorized to update products**.
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+- **Body**:
+  ```json
+  {
+    "name": "string (optional)",
+    "category": "string (optional)",
+    "price": "number (optional)",
+    "stockLevel": "number (optional)",
+    "restockThreshold": "number (optional)"
+  }
+  ```
+
+### Responses
+- **`200 OK`**  
+  Product updated successfully.
+  - **Example**:
+  ```json
+  {
+    "status": "success",
+    "message": "Product updated successfully.",
+    "data": {
+      "productId": "12345"
+    }
+  }
+  ```
+
+- **`400 Bad Request`**  
+  Invalid request body or properties.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "\"<property-name>\" is required.",
+    "data": null
+  }
+  ```
+
+- **`401 Unauthorized`**  
+  User is not authorized to perform this action.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Only users with the 'owner' role are authorized to add, update, or delete products.",
+    "data": null
+  }
+  ```
+
+- **`404 Not Found`**  
+  Product with the specified ID was not found.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "No product found with the provided ID.",
+    "data": null
+  }
+  ```
+
+- **`409 Conflict`**  
+  A product with the same name already exists.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Product already exists.",
+    "data": null
+  }
+  ```
+
+- **`500 Internal Server Error`**  
+  Server error occurred while updating the product.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Failed to update product due to server error.",
+    "data": null
+  }
+  ```
+
+## 5. DELETE `/products/{productId}`
+
+Deletes a product from the inventory by its unique identifier. **Only users with the 'owner' role are authorized to delete products**.
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+
+### Responses
+- **`200 OK`**  
+  Product deleted successfully.
+  - **Example**:
+  ```json
+  {
+    "status": "success",
+    "message": "Product deleted successfully.",
+    "data": null
+  }
+  ```
+
+- **`401 Unauthorized`**  
+  User is not authorized to perform this action.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Only users with the 'owner' role are authorized to add, update, or delete products.",
+    "data": null
+  }
+  ```
+
+- **`404 Not Found`**  
+  Product with the specified ID was not found.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "No product found with the provided ID.",
+    "data": null
+  }
+  ```
+
+- **`500 Internal Server Error`**  
+  Server error occurred while deleting the product.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Failed to delete product due to server error.",
+    "data": null
+  }
+  ```
+
+## 6. POST `/products/{productId}/logs`
+
+Creates a log entry for a specific product identified by `productId`.
+
+### Request
+- **Headers**:
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <access-token>`
+- **Body**:
+  ```json
+  {
+    "stockIn": "number",
+    "stockOut": "number"
+  }
+  ```
+
+### Responses
+- **`200 OK`**  
+  Product logged successfully.
+  - **Example**:
+  ```json
+  {
+    "status": "success",
+    "message": "Product logged successfully.",
+    "data": {
+      "productId": "12345"
+    }
+  }
+  ```
+
+- **`400 Bad Request`**  
+  Invalid request body or properties.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "\"<property-name>\" is required.",
+    "data": null
+  }
+  ```
+
+  Attempting to log outgoing items (`stockOut`) exceeding available stock (`stockLevel`).
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "\"stockOut\" must be less than or equal to the current product\'s \"stockLevel\".",
+    "data": null
+  }
+  ```
+
+  Attempting to log empty changes.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "\"stockIn\" and \"stockOut\" cannot both be 0 at the same time.",
+    "data": null
+  }
+  ```
+
+- **`404 Not Found`**  
+  Product with the specified ID was not found.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "No product found with the provided ID.",
+    "data": null
+  }
+  ```
+
+- **`500 Internal Server Error`**  
+  Server error occurred while logging the product.
+  - **Example**:
+  ```json
+  {
+    "status": "error",
+    "message": "Failed to log product due to server error.",
+    "data": null
+  }
+  ```
