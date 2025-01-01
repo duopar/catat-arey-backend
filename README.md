@@ -10,7 +10,7 @@ Registers a new user in the system.
 
 ### Request
 - **Headers**:
-  - `X-API-Key: <api-key>` (required)
+  - `X-API-Key: <api-key>`
 - **Body**:
   ```json
   {
@@ -86,7 +86,7 @@ Authenticates a user and generates access and refresh tokens.
 
 ### Request
 - **Headers**:
-  - `X-API-Key: <api-key>` (required)
+  - `X-API-Key: <api-key>`
 - **Body**:
   ```json
   {
@@ -153,8 +153,8 @@ Generates a new access token using a valid refresh token.
 
 ### Request
 - **Headers**:
-  - `X-API-Key: <api-key>` (required)
-  - `Authorization: Bearer <refresh-token>` (required)
+  - `X-API-Key: <api-key>`
+  - `Authorization: Bearer <refresh-token>`
 
 ### Responses
 - **`200 OK`**  
