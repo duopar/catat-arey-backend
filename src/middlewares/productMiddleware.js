@@ -103,54 +103,9 @@ const validateCreateOrUpdateProduct = async (req, res, next) => {
   next();
 };
 
-const validateCreateProductLog = (req, res, next) => {
-  // product snapshot from validateProductIdParam middleware
-  const currentStockLevel = req.productSnapshot.data().stockLevel;
-
-  const schema = joi
-    .object({
-      stockIn: joi.number().integer().strict().min(0).required(),
-      stockOut: joi
-        .number()
-        .integer()
-        .strict()
-        .min(0)
-        .max(currentStockLevel)
-        .required()
-        .messages({
-          'number.max':
-            '"stockOut" must be less than or equal to the current product\'s "stockLevel".',
-        }),
-    })
-    .custom((value, helpers) => {
-      const { stockIn, stockOut } = value;
-
-      if (stockIn === 0 && stockOut === 0) {
-        return helpers.message(
-          '"stockIn" and "stockOut" cannot both be 0 at the same time.'
-        );
-      }
-
-      return value;
-    });
-
-  const { error } = schema.validate(req.body);
-
-  if (error) {
-    return res.status(400).json({
-      status: 'error',
-      message: error.details[0].message,
-      data: null,
-    });
-  }
-
-  next();
-};
-
 module.exports = {
   validateUserRole,
   validateProductQueryParam,
   validateProductIdParam,
   validateCreateOrUpdateProduct,
-  validateCreateProductLog,
 };

@@ -5,7 +5,6 @@ const {
   validateProductQueryParam,
   validateProductIdParam,
   validateCreateOrUpdateProduct,
-  validateCreateProductLog,
 } = require('../middlewares/productMiddleware');
 
 const {
@@ -14,7 +13,6 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  createProductLog,
 } = require('../controllers/productController');
 
 productRouter.get('/', validateProductQueryParam, getAllProducts);
@@ -37,13 +35,6 @@ productRouter.delete(
   validateUserRole,
   validateProductIdParam,
   deleteProduct
-);
-// log products
-productRouter.post(
-  '/:productId/logs',
-  validateProductIdParam,
-  validateCreateProductLog,
-  createProductLog
 );
 
 module.exports = productRouter;
