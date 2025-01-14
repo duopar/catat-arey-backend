@@ -2,7 +2,7 @@ services:
   server:
     build:
       context: .
-      target: dev
+      target: prod
     secrets:
       - gcloud_credentials
     environment:
