@@ -187,7 +187,7 @@ describe('Validate getProductById controller', () => {
               id: 'logId-002',
               data: () => ({
                 changeType: 'stockOut',
-                stockChange: -10,
+                stockChange: 10,
               }),
             },
           ];

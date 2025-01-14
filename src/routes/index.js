@@ -7,5 +7,6 @@ const productRouter = require('./productRoutes');
 apiRouter.use('/auth', userValidationRouter);
 apiRouter.use('/users', userRouter);
 apiRouter.use('/products', productRouter);
+//apiRouter.use('/logs', logRouter);
 
 module.exports = apiRouter;

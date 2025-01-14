@@ -78,7 +78,7 @@ const getProductById = async (req, res) => {
         if (doc.data().changeType === 'stockIn') {
           stockInToday += doc.data().stockChange;
         } else {
-          stockOutToday += -1 * doc.data().stockChange;
+          stockOutToday += doc.data().stockChange;
         }
       });
     }
@@ -205,7 +205,7 @@ const createProductLog = async (req, res) => {
       await db.collection('inventoryLogs').add({
         productId,
         changeType: 'stockOut',
-        stockChange: -1 * stockOut,
+        stockChange: stockOut,
         createdAt,
       });
     }
