@@ -1,6 +1,42 @@
 const { Timestamp } = require('@google-cloud/firestore');
 const db = require('../config/firestore');
 
+const getInventoryLog = async (req, res) => {
+  try {
+    const inventoryLogSnapshot = await db.collection('inventoryLogs').get();
+
+    if (inventoryLogSnapshot.empty) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'No inventory logs found.',
+        data: null,
+      });
+    }
+
+    let inventoryLogs = [];
+
+    inventoryLogSnapshot.forEach((doc) => {
+      inventoryLogs.push({
+        inventoryLogId: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Inventory logs retrieved successfully.',
+      data: inventoryLogs,
+    });
+  } catch (error) {
+    console.error('Error retrieving inventory logs:', error);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve inventory logs due to server error.',
+      data: null,
+    });
+  }
+};
+
 const createInventoryLog = async (req, res) => {
   try {
     const { productId, stockIn, stockOut } = req.body;
@@ -103,17 +139,21 @@ const createInventoryLogFromHistory = async (req, res) => {
 
     return res.status(201).json({
       status: 'success',
-      message: 'Histories logged successfully.',
+      message: 'History data logged successfully.',
       data: null,
     });
   } catch (error) {
-    console.error('Error logging histories:', error);
+    console.error('Error logging history data:', error);
     return res.status(500).json({
       status: 'error',
-      message: 'Failed to log histories due to server error.',
+      message: 'Failed to log history data due to server error.',
       data: null,
     });
   }
 };
 
-module.exports = { createInventoryLog, createInventoryLogFromHistory };
+module.exports = {
+  getInventoryLog,
+  createInventoryLog,
+  createInventoryLogFromHistory,
+};
