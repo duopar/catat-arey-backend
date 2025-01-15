@@ -22,6 +22,14 @@ const getInventoryLog = async (req, res) => {
       });
     });
 
+    const { productId } = req.query;
+
+    if (productId) {
+      inventoryLogs = inventoryLogs.filter((log) => {
+        return log.productId === productId;
+      });
+    }
+
     return res.status(200).json({
       status: 'success',
       message: 'Inventory logs retrieved successfully.',
