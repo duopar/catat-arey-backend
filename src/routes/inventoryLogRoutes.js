@@ -5,12 +5,12 @@ const {
 } = require('../middlewares/inventoryLogMiddleware');
 
 const {
-  getInventoryLog,
+  getInventoryLogs,
   createInventoryLog,
   createInventoryLogFromHistory,
 } = require('../controllers/inventoryLogController');
 
-inventoryLogRouter.get('/', getInventoryLog);
+inventoryLogRouter.get('/', getInventoryLogs);
 inventoryLogRouter.post('/', validateCreateInventoryLog, createInventoryLog);
 inventoryLogRouter.post('/histories', createInventoryLogFromHistory);
 

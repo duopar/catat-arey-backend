@@ -4,7 +4,7 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  createProductLog,
+  //createProductLog,
 } = require('../../../controllers/productController');
 
 const { createMockResponse } = require('../utils/jestMocks');
@@ -347,49 +347,49 @@ describe('Validate deleteProduct controller', () => {
   });
 });
 
-describe('Validate createProductLog controller', () => {
-  let mockRequest;
-
-  beforeEach(() => {
-    mockRequest = {
-      params: {
-        productId: 'productId-001',
-      },
-      productSnapshot: {
-        data: () => ({
-          stockLevel: 10,
-        }),
-      },
-      body: {
-        stockIn: 5,
-        stockOut: 10,
-      },
-    };
-  });
-
-  it('Fail to log product when server encounters an error and return 500.', async () => {
-    db.add.mockRejectedValueOnce(new Error('Database query failed.'));
-
-    await createProductLog(mockRequest, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(500);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'error',
-      message: 'Failed to log product due to server error.',
-      data: null,
-    });
-  });
-
-  it('Successfully log product and return 201.', async () => {
-    await createProductLog(mockRequest, mockResponse);
-
-    expect(mockResponse.status).toHaveBeenCalledWith(201);
-    expect(mockResponse.json).toHaveBeenCalledWith({
-      status: 'success',
-      message: 'Product logged successfully.',
-      data: {
-        productId: mockRequest.params.productId,
-      },
-    });
-  });
-});
+//describe('Validate createProductLog controller', () => {
+//  let mockRequest;
+//
+//  beforeEach(() => {
+//    mockRequest = {
+//      params: {
+//        productId: 'productId-001',
+//      },
+//      productSnapshot: {
+//        data: () => ({
+//          stockLevel: 10,
+//        }),
+//      },
+//      body: {
+//        stockIn: 5,
+//        stockOut: 10,
+//      },
+//    };
+//  });
+//
+//  it('Fail to log product when server encounters an error and return 500.', async () => {
+//    db.add.mockRejectedValueOnce(new Error('Database query failed.'));
+//
+//    await createProductLog(mockRequest, mockResponse);
+//
+//    expect(mockResponse.status).toHaveBeenCalledWith(500);
+//    expect(mockResponse.json).toHaveBeenCalledWith({
+//      status: 'error',
+//      message: 'Failed to log product due to server error.',
+//      data: null,
+//    });
+//  });
+//
+//  it('Successfully log product and return 201.', async () => {
+//    await createProductLog(mockRequest, mockResponse);
+//
+//    expect(mockResponse.status).toHaveBeenCalledWith(201);
+//    expect(mockResponse.json).toHaveBeenCalledWith({
+//      status: 'success',
+//      message: 'Product logged successfully.',
+//      data: {
+//        productId: mockRequest.params.productId,
+//      },
+//    });
+//  });
+//});

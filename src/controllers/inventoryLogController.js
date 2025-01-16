@@ -1,9 +1,20 @@
 const { Timestamp } = require('@google-cloud/firestore');
 const db = require('../config/firestore');
 
-const getInventoryLog = async (req, res) => {
+const getInventoryLogs = async (req, res) => {
   try {
-    const inventoryLogSnapshot = await db.collection('inventoryLogs').get();
+    const { productId } = req.query;
+
+    let inventoryLogSnapshot = null;
+
+    if (productId) {
+      inventoryLogSnapshot = await db
+        .collection('inventoryLogs')
+        .where('productId', '==', productId)
+        .get();
+    } else {
+      inventoryLogSnapshot = await db.collection('inventoryLogs').get();
+    }
 
     if (inventoryLogSnapshot.empty) {
       return res.status(404).json({
@@ -21,14 +32,6 @@ const getInventoryLog = async (req, res) => {
         ...doc.data(),
       });
     });
-
-    const { productId } = req.query;
-
-    if (productId) {
-      inventoryLogs = inventoryLogs.filter((log) => {
-        return log.productId === productId;
-      });
-    }
 
     return res.status(200).json({
       status: 'success',
@@ -100,12 +103,6 @@ const createInventoryLog = async (req, res) => {
 const createInventoryLogFromHistory = async (req, res) => {
   try {
     const historyLogs = req.body;
-
-    //  TODO: cek apakah setiap nama data history sudah berada pada koleksi products
-    //  TODO: jika iya, ambil id dari produk tersebut
-    //  TODO: jika belum, tambahkan produk tersebut ke koleksi products, lalu ambil idnya
-    //  TODO: masukkan setiap data history tersebut ke koleksi inventoryLogs
-
     const batch = db.batch();
     const inventoryLogRef = db.collection('inventoryLogs');
 
@@ -118,10 +115,10 @@ const createInventoryLogFromHistory = async (req, res) => {
         .get();
 
       if (!productSnapshot.empty) {
-        productSnapshot.forEach((doc) => {
-          productId = doc.id;
-        });
+        // check if history data name exists in products, then get its ID
+        productId = productSnapshot.docs[0].id;
       } else {
+        // if not, add the product to products and get its ID
         const productRef = await db.collection('products').add({
           name,
           category: 'pokok',
@@ -143,6 +140,7 @@ const createInventoryLogFromHistory = async (req, res) => {
       });
     }
 
+    // insert history data into inventoryLogs
     await batch.commit();
 
     return res.status(201).json({
@@ -161,7 +159,7 @@ const createInventoryLogFromHistory = async (req, res) => {
 };
 
 module.exports = {
-  getInventoryLog,
+  getInventoryLogs,
   createInventoryLog,
   createInventoryLogFromHistory,
 };
