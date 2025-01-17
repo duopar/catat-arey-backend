@@ -1,5 +1,39 @@
 const db = require('../config/firestore');
 
+const getProducts = async (req, res, next) => {
+  let productSnapshot = await db.collection('products').get();
+
+  const { productId } = req.query;
+
+  let products = {};
+
+  if (productId) {
+    productSnapshot.docs.forEach((doc) => {
+      if (doc.id === productId) {
+        products[doc.id] = doc.data();
+      }
+    });
+  } else {
+    productSnapshot.docs.forEach((doc) => {
+      products[doc.id] = doc.data();
+    });
+  }
+
+  if (Object.keys(products).length === 0) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'No products found.',
+      data: null,
+    });
+  }
+
+  //console.log(products);
+
+  req.products = products;
+
+  next();
+};
+
 const getInventoryLogs = async (req, res, next) => {
   try {
     const { productId } = req.query;
@@ -45,6 +79,7 @@ const getInventoryLogs = async (req, res, next) => {
     });
 
     req.inventoryLogs = inventoryLogs;
+    //console.log(inventoryLogs);
 
     next();
   } catch (error) {
@@ -57,4 +92,4 @@ const getInventoryLogs = async (req, res, next) => {
   }
 };
 
-module.exports = { getInventoryLogs };
+module.exports = { getInventoryLogs, getProducts };

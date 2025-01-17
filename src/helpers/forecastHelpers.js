@@ -10,7 +10,8 @@ const fillMissingDates = (data) => {
 
   // Cari tanggal terlama dan terkini
   const earliestDate = new Date(Math.min(...dates));
-  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
   // Objek hasil baru
   const filledData = { ...data };
@@ -18,7 +19,7 @@ const fillMissingDates = (data) => {
   // Iterasi dari tanggal terlama hingga hari ini
   for (
     let current = new Date(earliestDate);
-    current <= today;
+    current <= yesterday;
     current.setDate(current.getDate() + 1)
   ) {
     // Format tanggal kembali ke "dd/mm/yyyy"
@@ -44,6 +45,41 @@ const fillMissingDates = (data) => {
       );
     })
   );
+};
+
+// Fungsi untuk mendapatkan nama hari
+const getDayOfWeek = (dateStr) => {
+  const [day, month, year] = dateStr.split('/');
+  const date = new Date(`${year}-${month}-${day}`);
+  const daysOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  return daysOfWeek[date.getDay()];
+};
+
+const groupDataByDayOfWeek = (data) => {
+  // Objek hasil
+  const groupedData = {};
+
+  // Iterasi setiap produk dalam data
+  Object.keys(data).forEach((productId) => {
+    const productData = data[productId];
+    groupedData[productId] = {
+      mon: [],
+      tue: [],
+      wed: [],
+      thu: [],
+      fri: [],
+      sat: [],
+      sun: [],
+    };
+
+    // Iterasi setiap tanggal dan nilai penjualan
+    Object.entries(productData).forEach(([date, value]) => {
+      const dayOfWeek = getDayOfWeek(date); // Dapatkan nama hari
+      groupedData[productId][dayOfWeek].push(value); // Tambahkan nilai ke hari yang sesuai
+    });
+  });
+
+  return groupedData;
 };
 
 // Classification function
@@ -82,6 +118,8 @@ const predictTrendingWithExponentialSmoothing = (sales, alpha = 0.3) => {
 
 module.exports = {
   fillMissingDates,
+  getDayOfWeek,
+  groupDataByDayOfWeek,
   classifyProduct,
   predictMean,
   predictMovingAverage,

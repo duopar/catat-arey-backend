@@ -1,5 +1,6 @@
 const {
   fillMissingDates,
+  groupDataByDayOfWeek,
   classifyProduct,
   predictMean,
   predictMovingAverage,
@@ -32,21 +33,25 @@ const getSalesForecast = async (req, res) => {
     dailySales[productId] = fillMissingDates(dailySales[productId]);
   });
 
+  //console.log(dailySales);
+
+  dailySales = groupDataByDayOfWeek(dailySales);
+
+  //console.log(dailySales);
+
   // Calculate statistics for each product
   const predictions = Object.keys(dailySales).map((product) => {
     const numberOfDaysInAWeek = 7;
-    const sales = Object.values(dailySales[product]);
     const predictedSales = new Array(numberOfDaysInAWeek);
+    const sales = Object.values(dailySales[product]);
+    const saleDays = Object.keys(dailySales[product]);
     const saleClassifications = new Array(numberOfDaysInAWeek);
     const saleMeans = new Array(numberOfDaysInAWeek);
     const saleStandardDeviations = new Array(numberOfDaysInAWeek);
 
-    //let daysRecorded = null;
-
     for (let i = 0; i < numberOfDaysInAWeek; i++) {
-      saleMeans[i] = math.mean(sales);
-      saleStandardDeviations[i] = math.std(sales);
-      //daysRecorded = sales.length;
+      saleMeans[i] = math.mean(sales[i]);
+      saleStandardDeviations[i] = math.std(sales[i]);
       saleClassifications[i] = classifyProduct(
         saleMeans[i],
         saleStandardDeviations[i]
@@ -56,18 +61,48 @@ const getSalesForecast = async (req, res) => {
         predictedSales[i] = Math.round(predictMean(saleMeans[i]));
       } else if (saleClassifications[i] === 'trending') {
         predictedSales[i] = Math.round(
-          predictTrendingWithExponentialSmoothing(sales)
+          predictTrendingWithExponentialSmoothing(sales[i])
         );
       } else {
-        predictedSales[i] = Math.round(predictMovingAverage(sales));
+        predictedSales[i] = Math.round(predictMovingAverage(sales[i]));
       }
 
-      sales.push(predictedSales[i]);
+      dailySales[product][saleDays[i]] = predictedSales[i];
+    }
+
+    //console.log(saleClassifications);
+
+    const restockThreshold = req.products[product].restockThreshold;
+    let stockLevel = req.products[product].stockLevel;
+    let predictedRestockDay = null;
+
+    let days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const today = new Date().getDay();
+
+    const k = days.length - today;
+    const reverse = (left, right) => {
+      while (left < right) {
+        [days[left], days[right]] = [days[right], days[left]];
+        left++, right--;
+      }
+    };
+
+    reverse(0, days.length - 1);
+    reverse(0, k - 1);
+    reverse(k, days.length - 1);
+
+    for (const day of days) {
+      stockLevel -= dailySales[product][day];
+      if (stockLevel < restockThreshold) {
+        predictedRestockDay = day;
+        break;
+      }
     }
 
     return {
       productId: product,
-      predictedSales,
+      predictedSales: dailySales[product],
+      predictedRestockDay,
     };
   });
 
