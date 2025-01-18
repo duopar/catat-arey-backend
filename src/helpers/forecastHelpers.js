@@ -1,50 +1,56 @@
 const math = require('mathjs');
 
-const fillMissingDates = (data) => {
-  // Konversi data menjadi array tanggal
-  const dates = Object.keys(data).map((date) => {
-    // Konversi ke format ISO untuk mempermudah pengurutan dan manipulasi
-    const [day, month, year] = date.split('/');
-    return new Date(`${year}-${month}-${day}`);
+const fillMissingDates = (products) => {
+  const filledProducts = {};
+
+  Object.keys(products).forEach((product) => {
+    // Konversi data menjadi array tanggal
+    const dates = Object.keys(products[product]).map((date) => {
+      // Konversi ke format ISO untuk mempermudah pengurutan dan manipulasi
+      const [day, month, year] = date.split('/');
+      return new Date(`${year}-${month}-${day}`);
+    });
+
+    // Cari tanggal terlama dan terkini
+    const earliestDate = new Date(Math.min(...dates));
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Objek hasil baru
+    const filledData = { ...products[product] };
+
+    // Iterasi dari tanggal terlama hingga hari ini
+    for (
+      let current = new Date(earliestDate);
+      current <= yesterday;
+      current.setDate(current.getDate() + 1)
+    ) {
+      // Format tanggal kembali ke "dd/mm/yyyy"
+      const day = current.getDate().toString().padStart(2, '0');
+      const month = (current.getMonth() + 1).toString().padStart(2, '0');
+      const year = current.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+
+      // Jika tanggal tidak ada, tambahkan dengan nilai 0
+      if (!filledData[formattedDate]) {
+        filledData[formattedDate] = 0;
+      }
+    }
+
+    // Kembalikan hasil dengan tanggal terurut
+    filledProducts[product] = Object.fromEntries(
+      Object.entries(filledData).sort(([dateA], [dateB]) => {
+        const [dayA, monthA, yearA] = dateA.split('/');
+        const [dayB, monthB, yearB] = dateB.split('/');
+        return (
+          new Date(`${yearA}-${monthA}-${dayA}`) -
+          new Date(`${yearB}-${monthB}-${dayB}`)
+        );
+      })
+    );
   });
 
-  // Cari tanggal terlama dan terkini
-  const earliestDate = new Date(Math.min(...dates));
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  // Objek hasil baru
-  const filledData = { ...data };
-
-  // Iterasi dari tanggal terlama hingga hari ini
-  for (
-    let current = new Date(earliestDate);
-    current <= yesterday;
-    current.setDate(current.getDate() + 1)
-  ) {
-    // Format tanggal kembali ke "dd/mm/yyyy"
-    const day = current.getDate().toString().padStart(2, '0');
-    const month = (current.getMonth() + 1).toString().padStart(2, '0');
-    const year = current.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
-
-    // Jika tanggal tidak ada, tambahkan dengan nilai 0
-    if (!filledData[formattedDate]) {
-      filledData[formattedDate] = 0;
-    }
-  }
-
-  // Kembalikan hasil dengan tanggal terurut
-  return Object.fromEntries(
-    Object.entries(filledData).sort(([dateA], [dateB]) => {
-      const [dayA, monthA, yearA] = dateA.split('/');
-      const [dayB, monthB, yearB] = dateB.split('/');
-      return (
-        new Date(`${yearA}-${monthA}-${dayA}`) -
-        new Date(`${yearB}-${monthB}-${dayB}`)
-      );
-    })
-  );
+  return filledProducts;
 };
 
 // Fungsi untuk mendapatkan nama hari

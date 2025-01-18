@@ -18,7 +18,7 @@ const getSalesForecast = async (req, res) => {
     const [dateKey] = entry.createdAt.split(','); // Ambil bagian tanggal saja
 
     if (!dailySales[entry.productId]) {
-      dailySales[entry.productId] = dailySales[entry.productId] = {};
+      dailySales[entry.productId] = {};
     }
 
     if (!dailySales[entry.productId][dateKey]) {
@@ -29,15 +29,7 @@ const getSalesForecast = async (req, res) => {
   });
 
   // Isi tanggal yang kosong
-  Object.keys(dailySales).forEach((productId) => {
-    dailySales[productId] = fillMissingDates(dailySales[productId]);
-  });
-
-  //console.log(dailySales);
-
-  dailySales = groupDataByDayOfWeek(dailySales);
-
-  //console.log(dailySales);
+  dailySales = groupDataByDayOfWeek(fillMissingDates(dailySales));
 
   // Calculate statistics for each product
   const predictions = Object.keys(dailySales).map((product) => {
@@ -72,8 +64,14 @@ const getSalesForecast = async (req, res) => {
 
     //console.log(saleClassifications);
 
-    const restockThreshold = req.products[product].restockThreshold;
-    let stockLevel = req.products[product].stockLevel;
+    const products = req.products;
+
+    if (!products[product]) {
+      return;
+    }
+
+    const restockThreshold = products[product].restockThreshold;
+    let stockLevel = products[product].stockLevel;
     let predictedRestockDay = null;
 
     let days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
