@@ -31,6 +31,8 @@ const getSalesForecast = async (req, res) => {
   // Isi tanggal yang kosong
   dailySales = groupDataByDayOfWeek(fillMissingDates(dailySales));
 
+  console.log(dailySales);
+
   // Calculate statistics for each product
   const predictions = Object.keys(dailySales).map((product) => {
     const numberOfDaysInAWeek = 7;
@@ -42,6 +44,10 @@ const getSalesForecast = async (req, res) => {
     const saleStandardDeviations = new Array(numberOfDaysInAWeek);
 
     for (let i = 0; i < numberOfDaysInAWeek; i++) {
+      if (sales[i].length === 0) {
+        sales[i] = [0];
+      }
+
       saleMeans[i] = math.mean(sales[i]);
       saleStandardDeviations[i] = math.std(sales[i]);
       saleClassifications[i] = classifyProduct(
